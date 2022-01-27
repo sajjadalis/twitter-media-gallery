@@ -8,11 +8,11 @@
 			<div class="flex justify-between px-4">
 				<div class="text-center sm:text-left sm:flex mb-2">
 					<a
-						:href="user.profile_image_url.replace('_normal', '')"
+						:href="user.profile_image_url_https.replace('_normal', '')"
 						target="_blank"
 						><img
 							class="h-32 w-32 rounded-full border-4 border-white -mt-16 mr-4"
-							:src="user.profile_image_url.replace('_normal', '')"
+							:src="user.profile_image_url_https.replace('_normal', '')"
 							alt=""
 					/></a>
 					<div class="py-2">
