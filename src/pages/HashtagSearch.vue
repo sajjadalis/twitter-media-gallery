@@ -5,16 +5,16 @@
 				type="text"
 				name="twt_usr"
 				data-lpignore="true"
-				placeholder="Twitter Username"
+				placeholder="Twitter queryname"
 				class="w-full focus:shadow-red-500"
-				v-model="user"
+				v-model="query"
 			/>
 			<span
 				class="absolute top-0 right-0 mt-3 mr-3 text-gray-400 hover:text-gray-600 cursor-pointer"
-				@click.prevent="user = ''"
+				@click.prevent="query = ''"
 			>
 				<svg
-					v-if="user"
+					v-if="query"
 					xmlns="http://www.w3.org/2000/svg"
 					class="h-5 w-5"
 					viewBox="0 0 20 20"
@@ -63,7 +63,7 @@
 	</form>
 
 	<SearchHistory
-		:search_history="search_history"
+		:search_history="hashtag_history"
 		@media="historyClick"
 		@remove="removeHistory"
 		@clear="clearHistory"
@@ -72,7 +72,7 @@
 	<TabsContent
 		:photos="photos"
 		:videos="videos"
-		:user="user"
+		:user="query"
 		:result_count="result_count"
 	/>
 
@@ -105,13 +105,12 @@
 
 <script>
 import { onMounted, ref } from "vue";
-import SearchHistory from "./components/SearchHistory.vue";
-import TabsContent from "./components/TabsContent.vue";
-import api from "./composeables/api";
-import getUserID from "./composeables/getUserID";
-import TweetsWithVideo from "./composeables/TweetsWithVideo";
-import TweetsWithPhotos from "./composeables/TweetsWithPhotos";
-import getVideo from "./composeables/getVideo";
+import SearchHistory from "../components/SearchHistory.vue";
+import TabsContent from "../components/TabsContent.vue";
+import api from "../composeables/api";
+import TweetsWithVideo from "../composeables/TweetsWithVideo";
+import TweetsWithPhotos from "../composeables/TweetsWithPhotos";
+import getVideo from "../composeables/getVideo";
 
 export default {
 	components: {
@@ -119,44 +118,45 @@ export default {
 		SearchHistory,
 	},
 	setup() {
-		const user = ref("BBCEarth");
+		const query = ref("#Meme");
 		const num_of_results = ref(50);
 		const photos = ref([]);
 		const videos = ref([]);
-		const include = ref({});
+		const include = ref({
+			retweets: true,
+			replies: true,
+		});
 		const next_token = ref(null);
 		const result_count = ref(0);
 		const message = ref(null);
 		const loading = ref(false);
-		const search_history = ref([]);
+		const hashtag_history = ref([]);
 
 		onMounted(() => {
-			let history = JSON.parse(localStorage.getItem("search_history"));
+			let history = JSON.parse(localStorage.getItem("hashtag_history"));
 
 			if (history) {
-				search_history.value = history;
+				hashtag_history.value = history;
 			}
 		});
 
 		const historyClick = async (val) => {
-			user.value = val;
+			query.value = val;
 			await getMedia();
 		};
 
 		const removeHistory = (i) => {
-			search_history.value.splice(i, 1);
+			hashtag_history.value.splice(i, 1);
 			localStorage.setItem(
-				"search_history",
-				JSON.stringify(search_history.value)
+				"hashtag_history",
+				JSON.stringify(hashtag_history.value)
 			);
 		};
 
 		const clearHistory = () => {
-			localStorage.removeItem("search_history");
-			search_history.value = [];
+			localStorage.removeItem("hashtag_history");
+			hashtag_history.value = [];
 		};
-
-		const { userId, error, loadUserID } = getUserID();
 
 		const getMedia = async (token) => {
 			loading.value = true;
@@ -169,8 +169,8 @@ export default {
 				return;
 			}
 
-			if (!user.value) {
-				message.value = "Please set a username";
+			if (!query.value) {
+				message.value = "Please set a query";
 				loading.value = false;
 				return;
 			}
@@ -180,14 +180,16 @@ export default {
 				photos.value = [];
 				videos.value = [];
 				result_count.value = 0;
-				await loadUserID(user.value);
 			}
 
-			if (search_history.value && !search_history.value.includes(user.value)) {
-				search_history.value.push(user.value);
+			if (
+				hashtag_history.value &&
+				!hashtag_history.value.includes(query.value)
+			) {
+				hashtag_history.value.push(query.value);
 				localStorage.setItem(
-					"search_history",
-					JSON.stringify(search_history.value)
+					"hashtag_history",
+					JSON.stringify(hashtag_history.value)
 				);
 			}
 
@@ -200,15 +202,24 @@ export default {
 				exclude = "exclude=retweets&";
 			}
 
-			let search_params = `${exclude}max_results=${num_of_results.value}&tweet.fields=id,created_at,text,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
+			let q = query.value;
+			q = q.replace(/#/g, "%23");
+			console.log(q);
+			q = q.replace(" ", "+");
+
+			let search_params = `query=${q}&max_results=${num_of_results.value}&expansions=attachments.media_keys&tweet.fields=id,created_at,text&user.fields=id,name,username&media.fields=media_key,preview_image_url,url`;
 
 			if (token) {
-				search_params = `${exclude}max_results=${num_of_results.value}&tweet.fields=attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url&pagination_token=${token}`;
+				search_params = `query=${q}&max_results=${num_of_results.value}&expansions=attachments.media_keys&tweet.fields=id,created_at,text&user.fields=id,name,username&media.fields=media_key,preview_image_url,url&pagination_token=${token}`;
 			}
 
+			console.log(search_params);
+
 			await api
-				.get(`2/users/${userId.value}/tweets?${search_params}`)
+				.get(`2/tweets/search/recent?${search_params}`)
 				.then((res) => {
+					console.log(res.data);
+
 					if (res.data.errors) {
 						message.value = res.data.errors[0].detail;
 						loading.value = false;
@@ -218,9 +229,11 @@ export default {
 					if (!res.data.hasOwnProperty("includes")) {
 						result_count.value += res.data.meta.result_count;
 						next_token.value = res.data.meta.next_token;
-						message.value = `No photo found in ${result_count.value} tweets. Try to increase number of tweets`;
+						message.value = `No photo/video found. Try to increase number of tweets or load more`;
 						loading.value = false;
 						return;
+					} else {
+						message.value = "";
 					}
 
 					if (res.data.hasOwnProperty("meta")) {
@@ -259,12 +272,8 @@ export default {
 				});
 		};
 
-		const hello = () => {
-			console.log("q pressed");
-		};
-
 		return {
-			user,
+			query,
 			num_of_results,
 			photos,
 			videos,
@@ -274,11 +283,10 @@ export default {
 			result_count,
 			message,
 			getMedia,
-			search_history,
+			hashtag_history,
 			historyClick,
 			removeHistory,
 			clearHistory,
-			hello,
 		};
 	},
 };

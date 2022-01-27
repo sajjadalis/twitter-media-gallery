@@ -6,7 +6,7 @@
 		>
 			<div v-if="showText == 'true'" class="absolute top-0 w-full z-40">
 				<div
-					class="bg-gray-900 text-white text-xs text-center p-3 bg-opacity-70 mx-24"
+					class="bg-gray-900 text-white text-sm text-center p-3 bg-opacity-70 mx-24"
 				>
 					{{ img.text }} ({{ created_at(img.created_at) }})
 				</div>
@@ -152,7 +152,7 @@
 			</div>
 
 			<button
-				class="text-gray-300 hover:text-white absolute top-0 right-0 mt-4 mr-4 z-50"
+				class="text-gray-400 hover:text-white absolute top-0 right-0 mt-4 mr-4 z-50"
 				@click="$emit('close')"
 			>
 				<svg
@@ -172,7 +172,8 @@
 			</button>
 
 			<button
-				class="text-gray-400 hover:text-white absolute top-0 right-0 mt-14 mr-4 z-50"
+				:class="[showText == 'true' ? 'text-white' : 'text-gray-400']"
+				class="hover:text-white absolute top-0 right-0 mt-14 mr-4 z-50"
 				@click.prevent="text"
 				title="Toggle Tweet Text"
 			>
