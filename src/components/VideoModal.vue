@@ -8,7 +8,7 @@
 				<div
 					class="bg-gray-900 text-white text-sm text-center p-3 bg-opacity-70 mx-24"
 				>
-					{{ video.text }} ({{ created_at(video.created_at) }})
+					{{ video.text }} ({{ video.created_at }})
 				</div>
 			</div>
 

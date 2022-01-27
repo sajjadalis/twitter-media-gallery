@@ -36,22 +36,6 @@
 				v-model="num_of_results"
 			/>
 		</div>
-		<div class="relative mr-2">
-			<label class="absolute top-0 -mt-5 text-2xs">Retweets</label>
-			<input
-				type="checkbox"
-				v-model="include.retweets"
-				class="text-red-500 w-10 h-10"
-			/>
-		</div>
-		<div class="relative mr-2">
-			<label class="absolute top-0 -mt-5 text-2xs">Replies</label>
-			<input
-				type="checkbox"
-				v-model="include.replies"
-				class="text-red-500 w-10 h-10"
-			/>
-		</div>
 		<div class="w-40">
 			<button
 				type="submit"
@@ -122,10 +106,6 @@ export default {
 		const num_of_results = ref(50);
 		const photos = ref([]);
 		const videos = ref([]);
-		const include = ref({
-			retweets: true,
-			replies: true,
-		});
 		const next_token = ref(null);
 		const result_count = ref(0);
 		const message = ref(null);
@@ -193,21 +173,12 @@ export default {
 				);
 			}
 
-			let exclude = "exclude=retweets,replies&";
-			if (include.value.retweets && include.value.replies) {
-				exclude = "";
-			} else if (include.value.retweets) {
-				exclude = "exclude=replies&";
-			} else if (include.value.replies) {
-				exclude = "exclude=retweets&";
-			}
-
 			let q = query.value;
 			q = q.replace(/#/g, "%23");
 			console.log(q);
 			q = q.replace(" ", "+");
 
-			let search_params = `query=${q}&max_results=${num_of_results.value}&expansions=attachments.media_keys&tweet.fields=id,created_at,text&user.fields=id,name,username&media.fields=media_key,preview_image_url,url`;
+			let search_params = `query=${q}&max_results=${num_of_results.value}&tweet.fields=created_at&user.fields=id,name,username&expansions=attachments.media_keys&media.fields=media_key,preview_image_url,url`;
 
 			if (token) {
 				search_params = `query=${q}&max_results=${num_of_results.value}&expansions=attachments.media_keys&tweet.fields=id,created_at,text&user.fields=id,name,username&media.fields=media_key,preview_image_url,url&pagination_token=${token}`;
@@ -277,7 +248,6 @@ export default {
 			num_of_results,
 			photos,
 			videos,
-			include,
 			loading,
 			next_token,
 			result_count,

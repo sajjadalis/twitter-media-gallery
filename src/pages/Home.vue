@@ -69,7 +69,7 @@
 		@clear="clearHistory"
 	/>
 
-	<UserCard />
+	<UserCard v-if="Object.keys(userDetails).length !== 0" :user="userDetails" />
 
 	<TabsContent
 		:photos="photos"
@@ -127,6 +127,7 @@ export default {
 		const num_of_results = ref(50);
 		const photos = ref([]);
 		const videos = ref([]);
+		const userDetails = ref([]);
 		const include = ref({});
 		const next_token = ref(null);
 		const result_count = ref(0);
@@ -160,7 +161,7 @@ export default {
 			search_history.value = [];
 		};
 
-		const { userId, error, loadUserID } = getUserID();
+		const { userInfo, error, loadUserID } = getUserID();
 
 		const getMedia = async (token) => {
 			loading.value = true;
@@ -183,6 +184,7 @@ export default {
 				message.value = "";
 				photos.value = [];
 				videos.value = [];
+				userDetails.value = {};
 				result_count.value = 0;
 				await loadUserID(user.value);
 			}
@@ -194,6 +196,8 @@ export default {
 					JSON.stringify(search_history.value)
 				);
 			}
+
+			userDetails.value = await userInfo.value;
 
 			let exclude = "exclude=retweets,replies&";
 			if (include.value.retweets && include.value.replies) {
@@ -211,7 +215,7 @@ export default {
 			}
 
 			await api
-				.get(`2/users/${userId.value}/tweets?${search_params}`)
+				.get(`2/users/${userDetails.value.id}/tweets?${search_params}`)
 				.then((res) => {
 					if (res.data.errors) {
 						message.value = res.data.errors[0].detail;
@@ -265,6 +269,7 @@ export default {
 
 		return {
 			user,
+			userDetails,
 			num_of_results,
 			photos,
 			videos,
