@@ -8,7 +8,16 @@
 				<div
 					class="bg-gray-900 text-white text-sm text-center p-3 bg-opacity-70 mx-24"
 				>
-					{{ video.text }} ({{ video.created_at }})
+					{{ video.text }}
+					<span class="text-yellow-300 ml-2"
+						>({{ date(video.created_at) }})</span
+					>
+					<a
+						:href="'https://twitter.com/user/status/' + video.id"
+						target="_blank"
+						class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 leading-none text-xs ml-2"
+						>View Tweet</a
+					>
 				</div>
 			</div>
 
@@ -140,12 +149,11 @@ export default {
 			}
 		};
 
-		const created_at = (date) => {
-			//return moment(date).format("MMMM Do YYYY, h:mm:ss a");
+		const date = (date) => {
 			return moment(date, "YYYYMMDD").fromNow();
 		};
 
-		return { showText, text, close, created_at };
+		return { showText, text, close, date };
 	},
 };
 </script>

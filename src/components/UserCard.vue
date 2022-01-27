@@ -2,7 +2,7 @@
 	<div class="font-sans leading-tight bg-grey-lighter">
 		<div class="mx-auto bg-white overflow-hidden">
 			<div
-				class="bg-cover bg-center h-80"
+				class="bg-cover bg-center h-80 bg-gray-200"
 				:style="{ backgroundImage: 'url(' + user.profile_banner_url + ')' }"
 			></div>
 			<div class="flex justify-between px-4">
@@ -16,7 +16,7 @@
 							alt=""
 					/></a>
 					<div class="py-2">
-						<h3 class="font-bold text-2xl flex items-center">
+						<h3 class="font-bold text-2xl flex items-center leading-tight">
 							{{ user.name }}
 							<span v-if="user.verified" class="ml-1"
 								><svg
@@ -33,7 +33,11 @@
 							></span>
 						</h3>
 						<div class="inline-flex text-grey-dark sm:flex items-center">
-							@{{ user.screen_name }}
+							<a
+								:href="'https://twitter.com/' + user.screen_name"
+								target="_blank"
+								>@{{ user.screen_name }}</a
+							>
 						</div>
 					</div>
 				</div>

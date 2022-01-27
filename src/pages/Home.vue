@@ -254,6 +254,7 @@ export default {
 					// Add each video object to videos array
 					videoTweets.forEach(async (tweet) => {
 						let video = await getVideo(tweet.id);
+						video.id = tweet.id;
 						video.text = tweet.text;
 						video.created_at = tweet.created_at;
 						videos.value.push(video);

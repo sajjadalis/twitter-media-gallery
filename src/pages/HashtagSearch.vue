@@ -175,22 +175,18 @@ export default {
 
 			let q = query.value;
 			q = q.replace(/#/g, "%23");
-			console.log(q);
 			q = q.replace(" ", "+");
 
-			let search_params = `query=${q}&max_results=${num_of_results.value}&tweet.fields=created_at&user.fields=id,name,username&expansions=attachments.media_keys&media.fields=media_key,preview_image_url,url`;
+			let search_params = `query=${q}&max_results=${num_of_results.value}&tweet.fields=created_at&expansions=attachments.media_keys&media.fields=media_key,preview_image_url,url`;
 
 			if (token) {
-				search_params = `query=${q}&max_results=${num_of_results.value}&expansions=attachments.media_keys&tweet.fields=id,created_at,text&user.fields=id,name,username&media.fields=media_key,preview_image_url,url&pagination_token=${token}`;
+				search_params = `query=${q}&max_results=${num_of_results.value}&expansions=attachments.media_keys&tweet.fields=id,created_at,text&media.fields=media_key,preview_image_url,url&pagination_token=${token}`;
 			}
 
-			console.log(search_params);
-
+			// console.log(search_params);
 			await api
 				.get(`2/tweets/search/recent?${search_params}`)
 				.then((res) => {
-					console.log(res.data);
-
 					if (res.data.errors) {
 						message.value = res.data.errors[0].detail;
 						loading.value = false;
@@ -230,6 +226,7 @@ export default {
 					// Add each video object to videos array
 					videoTweets.forEach(async (tweet) => {
 						let video = await getVideo(tweet.id);
+						video.id = tweet.id;
 						video.text = tweet.text;
 						video.created_at = tweet.created_at;
 						videos.value.push(video);

@@ -9,9 +9,7 @@
 					class="bg-gray-900 text-white text-sm text-center p-3 bg-opacity-70 mx-24"
 				>
 					{{ img.text }}
-					<span class="text-yellow-300 ml-2"
-						>({{ created_at(img.created_at) }})</span
-					>
+					<span class="text-yellow-300 ml-2">({{ date(img.created_at) }})</span>
 					<a
 						:href="'https://twitter.com/user/status/' + img.id"
 						target="_blank"
@@ -326,8 +324,7 @@ export default {
 			};
 		};
 
-		const created_at = (date) => {
-			//return moment(date).format("MMMM Do YYYY, h:mm:ss a");
+		const date = (date) => {
 			return moment(date, "YYYYMMDD").fromNow();
 		};
 
@@ -340,7 +337,7 @@ export default {
 			save,
 			zoom,
 			rotate,
-			created_at,
+			date,
 		};
 	},
 };
