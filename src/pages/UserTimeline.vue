@@ -110,7 +110,7 @@ import { onMounted, ref } from "vue";
 import SearchHistory from "../components/SearchHistory.vue";
 import TabsContent from "../components/TabsContent.vue";
 import api from "../composeables/api";
-import getUserID from "../composeables/getUserID";
+import getUserInfo from "../composeables/getUserInfo";
 import TweetsWithVideo from "../composeables/TweetsWithVideo";
 import TweetsWithPhotos from "../composeables/TweetsWithPhotos";
 import getVideo from "../composeables/getVideo";
@@ -161,15 +161,16 @@ export default {
 			search_history.value = [];
 		};
 
-		const { userInfo, error, loadUserID } = getUserID();
+		const { userInfo, error, loadUserID } = getUserInfo();
 
 		const getMedia = async (token) => {
 			loading.value = true;
 
 			// Display error if number of tweets are less than 5.
 			// Twitter API minimum search limit = 5
-			if (num_of_results.value < 5) {
-				message.value = "Minimum results for tweets can not be less than 5";
+			if (num_of_results.value < 5 || num_of_results.value > 100) {
+				message.value =
+					"Number of results value can not be less than 5 or higher than 100";
 				loading.value = false;
 				return;
 			}

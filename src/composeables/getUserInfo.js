@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import api from "./api";
 
-const getUserID = () => {
+const getUserInfo = () => {
 	const userInfo = ref(null);
 	const error = ref(null);
 
@@ -21,4 +21,4 @@ const getUserID = () => {
 	return { userInfo, error, loadUserID };
 };
 
-export default getUserID;
+export default getUserInfo;

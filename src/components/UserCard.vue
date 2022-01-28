@@ -37,6 +37,7 @@
 							<a
 								:href="'https://twitter.com/' + user.screen_name"
 								target="_blank"
+								class="hover:text-gray-500"
 								>@{{ user.screen_name }}</a
 							>
 						</div>
@@ -72,7 +73,7 @@
 						<span v-if="user.entities.url" class="mr-3">
 							<a
 								:href="user.entities.url.urls[0].expanded_url"
-								class="flex items-center"
+								class="flex items-center hover:text-gray-500"
 								target="_blank"
 							>
 								<svg
@@ -121,7 +122,7 @@
 			<div
 				v-if="user.description"
 				v-html="user.description"
-				class="text-center"
+				class="text-center leading-relaxed"
 			></div>
 		</div>
 	</div>
