@@ -1,10 +1,11 @@
 <template>
 	<div class="font-sans leading-tight bg-grey-lighter">
 		<div class="mx-auto bg-white overflow-hidden">
-			<div
-				class="bg-cover bg-center h-80 bg-gray-200"
-				:style="{ backgroundImage: 'url(' + user.profile_banner_url + ')' }"
-			></div>
+			<div class="bg-cover bg-center bg-gray-200">
+				<a :href="user.profile_banner_url" target="_blank"
+					><img class="object-cover w-full h-80" :src="user.profile_banner_url"
+				/></a>
+			</div>
 			<div class="flex justify-between px-4">
 				<div class="text-center sm:text-left sm:flex mb-2">
 					<a

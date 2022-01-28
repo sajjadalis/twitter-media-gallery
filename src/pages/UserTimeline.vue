@@ -211,7 +211,7 @@ export default {
 			let search_params = `${exclude}max_results=${num_of_results.value}&tweet.fields=id,created_at,text,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
 
 			if (token) {
-				search_params = `${exclude}max_results=${num_of_results.value}&tweet.fields=attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url&pagination_token=${token}`;
+				search_params = `${exclude}max_results=${num_of_results.value}&tweet.fields=id,created_at,text,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url&pagination_token=${token}`;
 			}
 
 			await api

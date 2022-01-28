@@ -10,10 +10,8 @@
 					>
 				</h1>
 				<div class="font-bold text-lg text-gray-800 uppercase">
-					<router-link class="px-3 py-2" to="/">User Search</router-link>
-					<router-link class="px-3 py-2" to="/hashtags"
-						>Hashtag Search</router-link
-					>
+					<router-link class="px-3 py-2" to="/">User Timeline</router-link>
+					<router-link class="px-3 py-2" to="/search">Search</router-link>
 				</div>
 			</div>
 			<router-view />

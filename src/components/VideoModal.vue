@@ -15,7 +15,7 @@
 					<a
 						:href="'https://twitter.com/user/status/' + video.id"
 						target="_blank"
-						class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 leading-none text-xs ml-2"
+						class="inline-block bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 leading-none text-xs ml-2"
 						>View Tweet</a
 					>
 				</div>
@@ -23,9 +23,9 @@
 
 			<video
 				controls
-				playsinline
 				loop
 				autoplay
+				preload
 				class="z-10 w-auto mx-auto h-screen"
 			>
 				<source :src="video.url" type="video/mp4" />

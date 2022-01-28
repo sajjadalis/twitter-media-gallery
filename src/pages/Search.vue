@@ -5,7 +5,7 @@
 				type="text"
 				name="twt_usr"
 				data-lpignore="true"
-				placeholder="Twitter queryname"
+				placeholder="#hashtag / #multiple #hashtags / simple keyword"
 				class="w-full focus:shadow-red-500"
 				v-model="query"
 			/>
@@ -102,7 +102,7 @@ export default {
 		SearchHistory,
 	},
 	setup() {
-		const query = ref("#Meme");
+		const query = ref("#meme");
 		const num_of_results = ref(50);
 		const photos = ref([]);
 		const videos = ref([]);

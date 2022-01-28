@@ -1,10 +1,10 @@
 import { createWebHistory, createRouter } from "vue-router";
-import Home from "./pages/Home.vue";
-import HashtagSearch from "./pages/HashtagSearch.vue";
+import UserTimeline from "./pages/UserTimeline.vue";
+import Search from "./pages/Search.vue";
 
 const routes = [
-	{ path: "/", component: Home },
-	{ path: "/hashtags", component: HashtagSearch },
+	{ path: "/", component: UserTimeline },
+	{ path: "/search", component: Search },
 ];
 
 const router = createRouter({

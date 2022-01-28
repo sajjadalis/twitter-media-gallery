@@ -30,7 +30,7 @@
 						:href="img.url"
 						target="_blank"
 						class="text-gray-300 hover:text-white inline-block mr-2"
-						title="Open in New Tab"
+						v-tippy="'Open in New Tab'"
 						><svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="24"
@@ -49,12 +49,12 @@
 							<polyline points="15 3 21 3 21 9"></polyline>
 							<line x1="10" y1="14" x2="21" y2="3"></line></svg
 					></a>
-					<a
-						href="#"
-						@click.prevent="save(img)"
+					<button
+						@click.prevent="save(img.url)"
 						class="text-gray-300 hover:text-white inline-block mr-2"
-						title="Save"
-						><svg
+						v-tippy="'Save Photo'"
+					>
+						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="24"
 							height="24"
@@ -70,14 +70,15 @@
 								d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
 							></path>
 							<polyline points="17 21 17 13 7 13 7 21"></polyline>
-							<polyline points="7 3 7 8 15 8"></polyline></svg
-					></a>
-					<a
-						href="#"
+							<polyline points="7 3 7 8 15 8"></polyline>
+						</svg>
+					</button>
+					<button
 						@click.prevent="zoom('in')"
 						class="text-gray-300 hover:text-white inline-block mr-2"
-						title="Zoom In"
-						><svg
+						v-tippy="'Zoom In'"
+					>
+						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="24"
 							height="24"
@@ -92,14 +93,15 @@
 							<circle cx="11" cy="11" r="8"></circle>
 							<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
 							<line x1="11" y1="8" x2="11" y2="14"></line>
-							<line x1="8" y1="11" x2="14" y2="11"></line></svg
-					></a>
-					<a
-						href="#"
+							<line x1="8" y1="11" x2="14" y2="11"></line>
+						</svg>
+					</button>
+					<button
 						@click.prevent="zoom('out')"
 						class="text-gray-300 hover:text-white inline-block mr-2"
-						title="Zoom Out"
-						><svg
+						v-tippy="'Zoom Out'"
+					>
+						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="24"
 							height="24"
@@ -113,14 +115,15 @@
 						>
 							<circle cx="11" cy="11" r="8"></circle>
 							<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-							<line x1="8" y1="11" x2="14" y2="11"></line></svg
-					></a>
-					<a
-						href="#"
+							<line x1="8" y1="11" x2="14" y2="11"></line>
+						</svg>
+					</button>
+					<button
 						@click.prevent="rotate('left')"
 						class="text-gray-300 hover:text-white inline-block mr-2"
-						title="Rotate Anti-Clockwise"
-						><svg
+						v-tippy="'Rotate Anti-Clockwise'"
+					>
+						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="24"
 							height="24"
@@ -133,14 +136,15 @@
 							class="h-5 w-5"
 						>
 							<polyline points="1 4 1 10 7 10"></polyline>
-							<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg
-					></a>
-					<a
-						href="#"
+							<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+						</svg>
+					</button>
+					<button
 						@click.prevent="rotate('right')"
 						class="text-gray-300 hover:text-white inline-block"
-						title="Rotate Clockwise"
-						><svg
+						v-tippy="'Rotate Clockwise'"
+					>
+						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="24"
 							height="24"
@@ -153,8 +157,9 @@
 							class="h-5 w-5"
 						>
 							<polyline points="23 4 23 10 17 10"></polyline>
-							<path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg
-					></a>
+							<path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+						</svg>
+					</button>
 				</div>
 			</div>
 
@@ -182,7 +187,7 @@
 				:class="[showText == 'true' ? 'text-white' : 'text-gray-400']"
 				class="hover:text-white absolute top-0 right-0 mt-14 mr-4 z-50"
 				@click.prevent="text"
-				title="Toggle Tweet Text"
+				v-tippy="'Toggle Tweet Text'"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
