@@ -36,6 +36,22 @@
 				v-model="num_of_results"
 			/>
 		</div>
+		<div class="relative mr-2">
+			<label class="absolute top-0 -mt-5 text-2xs">Retweets</label>
+			<input
+				type="checkbox"
+				v-model="include.retweets"
+				class="text-red-500 w-10 h-10"
+			/>
+		</div>
+		<div class="relative mr-2">
+			<label class="absolute top-0 -mt-5 text-2xs">Replies</label>
+			<input
+				type="checkbox"
+				v-model="include.replies"
+				class="text-red-500 w-10 h-10"
+			/>
+		</div>
 		<div class="w-40">
 			<button
 				type="submit"
@@ -104,6 +120,7 @@ export default {
 	setup() {
 		const query = ref("#meme");
 		const num_of_results = ref(50);
+		const include = ref({ retweets: false, replies: true });
 		const photos = ref([]);
 		const videos = ref([]);
 		const next_token = ref(null);
@@ -177,13 +194,26 @@ export default {
 			q = q.replace(/#/g, "%23");
 			q = q.replace(" ", "+");
 
-			let search_params = `query=${q}&max_results=${num_of_results.value}&tweet.fields=created_at&expansions=attachments.media_keys&media.fields=media_key,preview_image_url,url`;
-
-			if (token) {
-				search_params = `query=${q}&max_results=${num_of_results.value}&expansions=attachments.media_keys&tweet.fields=id,created_at,text&media.fields=media_key,preview_image_url,url&pagination_token=${token}`;
+			let exclude = " -is:retweet -is:reply";
+			if (include.value.retweets && include.value.replies) {
+				exclude = "";
+			} else if (include.value.retweets) {
+				exclude = " -is:reply";
+			} else if (include.value.replies) {
+				exclude = " -is:retweet";
 			}
 
-			// console.log(search_params);
+			let search_params = `query=${q + exclude}&max_results=${
+				num_of_results.value
+			}&tweet.fields=created_at&expansions=attachments.media_keys&media.fields=media_key,preview_image_url,url`;
+
+			if (token) {
+				search_params = `query=${q + exclude}&max_results=${
+					num_of_results.value
+				}&tweet.fields=created_at&expansions=attachments.media_keys&media.fields=media_key,preview_image_url,url&pagination_token=${token}`;
+			}
+
+			console.log(search_params);
 			await api
 				.get(`2/tweets/search/recent?${search_params}`)
 				.then((res) => {
@@ -243,6 +273,7 @@ export default {
 		return {
 			query,
 			num_of_results,
+			include,
 			photos,
 			videos,
 			loading,

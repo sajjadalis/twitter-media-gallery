@@ -125,10 +125,10 @@ export default {
 	setup() {
 		const user = ref("BBCEarth");
 		const num_of_results = ref(50);
+		const include = ref({ retweets: false, replies: true });
 		const photos = ref([]);
 		const videos = ref([]);
 		const userDetails = ref([]);
-		const include = ref({});
 		const next_token = ref(null);
 		const result_count = ref(0);
 		const message = ref(null);

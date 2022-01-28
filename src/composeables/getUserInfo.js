@@ -10,7 +10,7 @@ const getUserInfo = () => {
 			.get(`1.1/users/show.json?screen_name=${user}`)
 			.then((res) => {
 				userInfo.value = res.data;
-				// console.log(userInfo.value);
+				console.log(userInfo.value);
 			})
 			.catch((err) => {
 				error.value = err.message;
