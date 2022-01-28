@@ -8,12 +8,19 @@
 				<div
 					class="bg-gray-900 text-white text-sm text-center p-3 bg-opacity-70 mx-24"
 				>
+					<a
+						v-if="img.username"
+						:href="'https://twitter.com/' + img.username"
+						target="_blank"
+						class="hover:text-yellow-400 font-bold"
+						>@{{ img.username }}:</a
+					>
 					{{ img.text }}
 					<span class="text-yellow-300 ml-2">({{ date(img.created_at) }})</span>
 					<a
-						:href="'https://twitter.com/user/status/' + img.id"
+						:href="'https://twitter.com/' + img.username + '/status/' + img.id"
 						target="_blank"
-						class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 leading-none text-xs ml-2"
+						class="inline-block bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 leading-none text-xs ml-2"
 						>View Tweet</a
 					>
 				</div>

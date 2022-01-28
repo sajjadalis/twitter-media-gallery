@@ -203,17 +203,16 @@ export default {
 				exclude = " -is:retweet";
 			}
 
-			let search_params = `query=${q + exclude}&max_results=${
+			let params = `query=${q + exclude}&max_results=${
 				num_of_results.value
-			}&tweet.fields=created_at&expansions=attachments.media_keys&media.fields=media_key,preview_image_url,url`;
+			}&tweet.fields=created_at,author_id&expansions=attachments.media_keys,author_id&media.fields=media_key,preview_image_url,url`;
+
+			let search_params = params;
 
 			if (token) {
-				search_params = `query=${q + exclude}&max_results=${
-					num_of_results.value
-				}&tweet.fields=created_at&expansions=attachments.media_keys&media.fields=media_key,preview_image_url,url&pagination_token=${token}`;
+				search_params = `${params}&pagination_token=${token}`;
 			}
 
-			console.log(search_params);
 			await api
 				.get(`2/tweets/search/recent?${search_params}`)
 				.then((res) => {
@@ -240,8 +239,20 @@ export default {
 						result_count.value = num_of_results.value;
 					}
 
-					let tweets = res.data.data;
+					let tweets = [];
 					let media = res.data.includes.media;
+
+					let tempTweets = res.data.data;
+					let tempUsers = res.data.includes.users;
+
+					tempTweets.forEach((x) => {
+						tempUsers.forEach((y) => {
+							if (x.author_id === y.id) {
+								delete y.id;
+								tweets.push({ ...x, ...y });
+							}
+						});
+					});
 
 					// Get tweets with photo and tweet text
 					let photoTweets = TweetsWithPhotos(tweets, media);
@@ -259,6 +270,7 @@ export default {
 						video.id = tweet.id;
 						video.text = tweet.text;
 						video.created_at = tweet.created_at;
+						video.username = tweet.username;
 						videos.value.push(video);
 					});
 

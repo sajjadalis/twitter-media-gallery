@@ -8,6 +8,13 @@
 				<div
 					class="bg-gray-900 text-white text-sm text-center p-3 bg-opacity-70 mx-24"
 				>
+					<a
+						v-if="video.username"
+						:href="'https://twitter.com/' + video.username"
+						target="_blank"
+						class="hover:text-yellow-400 font-bold"
+						>@{{ video.username }}:</a
+					>
 					{{ video.text }}
 					<span class="text-yellow-300 ml-2"
 						>({{ date(video.created_at) }})</span
@@ -35,7 +42,6 @@
 			<button
 				class="text-gray-400 hover:text-white absolute top-0 right-0 mt-4 mr-4 z-50"
 				@click="$emit('close')"
-				title="Close"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +63,7 @@
 				:class="[showText == 'true' ? 'text-white' : 'text-gray-400']"
 				class="hover:text-white absolute top-0 right-0 mt-14 mr-4 z-50"
 				@click.prevent="text"
-				title="Toggle Tweet Text"
+				v-tippy="'Toggle Tweet Text'"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
