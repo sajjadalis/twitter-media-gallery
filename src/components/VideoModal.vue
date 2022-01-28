@@ -26,7 +26,7 @@
 				playsinline
 				loop
 				autoplay
-				class="z-10 w-auto mx-auto my-3 h-screen"
+				class="z-10 w-auto mx-auto h-screen"
 			>
 				<source :src="video.url" type="video/mp4" />
 			</video>

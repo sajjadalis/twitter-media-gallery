@@ -215,7 +215,7 @@ export default {
 			}
 
 			await api
-				.get(`2/users/${userDetails.value.id}/tweets?${search_params}`)
+				.get(`2/users/${userDetails.value.id_str}/tweets?${search_params}`)
 				.then((res) => {
 					if (res.data.errors) {
 						message.value = res.data.errors[0].detail;
