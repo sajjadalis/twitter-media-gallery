@@ -26,7 +26,33 @@
 			<TabPanel>
 				<div v-if="photos.length" class="mt-5">
 					<masonry :cols="4" :gutter="10">
-						<div v-for="(img, i) in photos" :key="i">
+						<div v-for="(img, i) in photos" :key="i" class="relative">
+							<button
+								@click.prevent="likePhoto(img), $emit('like', img)"
+								class="absolute bottom-2 right-2"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="h-5 w-5 text-white hover:transition-all"
+									:class="[
+										photoLikes.some((e) => e.media_key === img.media_key)
+											? 'fill-red-500 text-red-500 hover:text-red-500'
+											: 'hover:text-gray-300',
+									]"
+								>
+									<path
+										d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+									></path>
+								</svg>
+							</button>
 							<a href="#" @click.prevent="mediaShow(img, i)"
 								><img class="item" :src="img.url"
 							/></a>
@@ -39,6 +65,7 @@
 						@close="showModal = false"
 						@next="nextMedia('photo')"
 						@prev="prevMedia('photo')"
+						@like="like"
 						:key="'next' + mediaIndex"
 					/>
 				</div>
@@ -53,12 +80,39 @@
 			<TabPanel>
 				<div v-if="videos.length" class="mt-5">
 					<masonry :cols="4" :gutter="8">
-						<div v-for="(video, i) in videos" :key="i">
-							<a
-								href="#"
-								@click.prevent="mediaShow(video, i)"
-								class="relative block mb-2"
-								><img :src="video.image" />
+						<div
+							v-for="(video, i) in videos"
+							:key="i"
+							class="relative block mb-2"
+						>
+							<button
+								@click.prevent="likeVideo(video)"
+								class="absolute bottom-2 right-2"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="h-5 w-5 mr-1 text-white hover:transition-all"
+									:class="[
+										videoLikes.some((e) => e.image === video.image)
+											? 'fill-red-500 text-red-500 hover:text-red-500'
+											: 'hover:text-gray-300',
+									]"
+								>
+									<path
+										d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+									></path>
+								</svg>
+							</button>
+							<a href="#" @click.prevent="mediaShow(video, i)" class="">
+								<img :src="video.image" />
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									class="absolute top-1/2 left-1/2 mx-auto h-12 w-12 -ml-6 -mt-6 opacity-40 text-white"
@@ -95,7 +149,7 @@
 	</TabGroup>
 </template>
 <script>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 import PhotoModal from "./PhotoModal.vue";
 import VideoModal from "./VideoModal.vue";
@@ -114,7 +168,8 @@ export default {
 		const mediaIndex = ref(null);
 		const showModal = ref(false);
 		const singleMedia = ref(null);
-		const artplayer = ref(true);
+		const photoLikes = ref([]);
+		const videoLikes = ref([]);
 
 		const mediaShow = (media, index) => {
 			mediaIndex.value = index;
@@ -171,14 +226,86 @@ export default {
 			}
 		};
 
+		onMounted(() => {
+			let photos = JSON.parse(localStorage.getItem("photo_likes"));
+			if (photos) {
+				photoLikes.value = photos;
+			}
+
+			let videos = JSON.parse(localStorage.getItem("video_likes"));
+			if (videos) {
+				videoLikes.value = videos;
+			}
+		});
+
+		const likePhoto = (photo) => {
+			if (photoLikes.value) {
+				let index;
+				const likeExist = photoLikes.value.some((e, i) => {
+					if (e.media_key === photo.media_key) {
+						index = i;
+						return true;
+					}
+				});
+				if (likeExist) {
+					photoLikes.value.splice(index, 1);
+					localStorage.setItem("photo_likes", JSON.stringify(photoLikes.value));
+					return;
+				}
+
+				photoLikes.value.push(photo);
+				localStorage.setItem("photo_likes", JSON.stringify(photoLikes.value));
+			}
+
+			if (!photoLikes.value.length) {
+				photoLikes.value.push(photo);
+				localStorage.setItem("photo_likes", JSON.stringify(photoLikes.value));
+			}
+			console.log(photoLikes.value);
+		};
+
+		const likeVideo = (video) => {
+			if (videoLikes.value) {
+				let index;
+				const likeExist = videoLikes.value.some((e, i) => {
+					if (e.id === video.id) {
+						index = i;
+						return true;
+					}
+				});
+				if (likeExist) {
+					videoLikes.value.splice(index, 1);
+					localStorage.setItem("video_likes", JSON.stringify(videoLikes.value));
+					return;
+				}
+
+				videoLikes.value.push(video);
+				localStorage.setItem("video_likes", JSON.stringify(videoLikes.value));
+			}
+
+			if (!videoLikes.value.length) {
+				videoLikes.value.push(video);
+				localStorage.setItem("video_likes", JSON.stringify(videoLikes.value));
+			}
+			console.log(videoLikes.value);
+		};
+
+		const like = (e) => {
+			likePhoto(e);
+		};
+
 		return {
 			mediaShow,
 			nextMedia,
 			prevMedia,
+			likePhoto,
+			likeVideo,
 			mediaIndex,
 			showModal,
 			singleMedia,
-			artplayer,
+			photoLikes,
+			videoLikes,
+			like,
 		};
 	},
 };

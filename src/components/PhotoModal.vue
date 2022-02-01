@@ -213,6 +213,34 @@
 			</button>
 
 			<button
+				class="hover:text-white absolute top-0 right-0 mt-28 mr-4 z-50"
+				@click="like"
+				v-tippy="'Like'"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="h-8 w-8 text-white"
+					:class="[
+						photoLikes.some((e) => e.media_key === img.media_key) || liked
+							? 'fill-red-500 text-red-500 hover:text-red-500'
+							: 'hover:text-gray-300',
+					]"
+				>
+					<path
+						d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+					></path>
+				</svg>
+			</button>
+
+			<button
 				class="text-gray-300 hover:text-white absolute top-2/4 right-0 -mt-8 mr-5"
 				@click="$emit('next')"
 			>
@@ -264,6 +292,8 @@ export default {
 		const style = ref({});
 		const rot = ref(0);
 		const showText = ref(null);
+		const photoLikes = ref([]);
+		const liked = ref(false);
 
 		onMounted(() => {
 			let showTweetText = localStorage.getItem("show_text");
@@ -340,16 +370,31 @@ export default {
 			return moment(date, "YYYYMMDD").fromNow();
 		};
 
+		onMounted(() => {
+			let photos = JSON.parse(localStorage.getItem("photo_likes"));
+			if (photos) {
+				photoLikes.value = photos;
+			}
+		});
+
+		const like = () => {
+			context.emit("like", props.img);
+			liked.value = !liked.value;
+		};
+
 		return {
 			style,
 			rot,
 			showText,
+			photoLikes,
 			text,
 			close,
 			save,
 			zoom,
 			rotate,
 			date,
+			like,
+			liked,
 		};
 	},
 };
