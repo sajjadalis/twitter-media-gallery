@@ -1,5 +1,5 @@
 <template>
-	<div class="font-sans leading-tight bg-grey-lighter">
+	<div class="font-sans leading-tight bg-grey-lighter mt-5">
 		<div class="mx-auto bg-white overflow-hidden">
 			<div class="bg-cover bg-center bg-gray-200">
 				<a :href="user.profile_banner_url" target="_blank"

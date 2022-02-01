@@ -1,11 +1,13 @@
 import { createWebHistory, createRouter } from "vue-router";
-import UserTimeline from "./pages/UserTimeline.vue";
+import Home from "./pages/Home.vue";
+import User from "./pages/User.vue";
 import Search from "./pages/Search.vue";
 import Likes from "./pages/Likes.vue";
 
 const routes = [
-	{ path: "/", component: UserTimeline },
-	{ path: "/search", component: Search },
+	{ path: "/", component: User },
+	{ path: "/:user", component: User, name: "user" },
+	{ path: "/search", component: Search, name: "search" },
 	{ path: "/likes", component: Likes },
 ];
 

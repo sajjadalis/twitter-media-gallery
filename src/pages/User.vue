@@ -1,18 +1,20 @@
 <template>
 	<Form
-		v-model="query"
+		v-model="user"
 		:num_of_results="num_of_results"
 		:include="include"
-		placeholder="#hashtag / #multiple #hashtags / simple keyword"
-		@search="getQuery()"
+		placeholder="Twitter Username"
+		@search="getUser()"
 	/>
 
-	<SearchHistory :search_history="hashtag_history" @media="historyClick" />
+	<SearchHistory :search_history="search_history" @media="historyClick" />
+
+	<UserCard v-if="Object.keys(userDetails).length !== 0" :user="userDetails" />
 
 	<TabsContent
 		:photos="photos"
 		:videos="videos"
-		:user="query"
+		:user="user"
 		:result_count="result_count"
 	/>
 
@@ -42,80 +44,84 @@
 		Load More
 	</button>
 </template>
-
 <script>
 import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
-import SearchHistory from "../components/SearchHistory.vue";
-import TabsContent from "../components/TabsContent.vue";
 import Form from "../components/Form.vue";
+import SearchHistory from "../components/SearchHistory.vue";
+import UserCard from "../components/UserCard.vue";
+import TabsContent from "../components/TabsContent.vue";
 import api from "../composeables/api";
+import getUserInfo from "../composeables/getUserInfo";
 import TweetsWithVideo from "../composeables/TweetsWithVideo";
 import TweetsWithPhotos from "../composeables/TweetsWithPhotos";
 import getVideo from "../composeables/getVideo";
-
 export default {
 	components: {
-		TabsContent,
-		SearchHistory,
 		Form,
+		SearchHistory,
+		UserCard,
+		TabsContent,
 	},
 	setup() {
 		const router = useRouter();
 		const route = useRoute();
-		const query = ref(route.query.q);
 		const num_of_results = ref(50);
 		const include = ref({ retweets: false, replies: true });
+		const user = ref(route.params.user);
+		const search_history = ref([]);
 		const photos = ref([]);
 		const videos = ref([]);
+		const userDetails = ref([]);
 		const next_token = ref(null);
 		const result_count = ref(0);
 		const message = ref(null);
 		const loading = ref(false);
-		const hashtag_history = ref([]);
 
 		onMounted(async () => {
-			let history = JSON.parse(localStorage.getItem("hashtag_history"));
+			let history = JSON.parse(localStorage.getItem("search_history"));
 
 			if (history) {
-				hashtag_history.value = history;
+				search_history.value = history;
 			}
-
-			if (query.value) {
+			if (user.value) {
 				await getMedia();
 			}
 		});
 
 		const historyClick = async (val) => {
 			router.push({
-				name: "search",
-				query: { q: val },
+				name: "user",
+				params: { user: val },
 			});
-			query.value = val;
+			user.value = val;
 			await getMedia();
 		};
 
-		const getQuery = async () => {
+		const getUser = async () => {
 			router.push({
-				name: "search",
-				query: { q: query.value },
+				name: "user",
+				params: { user: user.value },
 			});
 			await getMedia();
 		};
+
+		const { userInfo, error, loadUserID } = getUserInfo();
 
 		const getMedia = async (token) => {
 			loading.value = true;
 
 			// Display error if number of tweets are less than 5.
 			// Twitter API minimum search limit = 5
-			if (num_of_results.value < 5) {
-				message.value = "Minimum results for tweets can not be less than 5";
+			if (num_of_results.value < 5 || num_of_results.value > 100) {
+				message.value =
+					"Number of results value can not be less than 5 or higher than 100";
 				loading.value = false;
 				return;
 			}
 
-			if (!query.value) {
-				message.value = "Please set a query";
+			if (!user.value) {
+				message.value = "Please set a username";
 				loading.value = false;
 				return;
 			}
@@ -124,36 +130,31 @@ export default {
 				message.value = "";
 				photos.value = [];
 				videos.value = [];
+				userDetails.value = {};
 				result_count.value = 0;
+				await loadUserID(user.value);
 			}
 
-			if (
-				hashtag_history.value &&
-				!hashtag_history.value.includes(query.value)
-			) {
-				hashtag_history.value.push(query.value);
+			if (search_history.value && !search_history.value.includes(user.value)) {
+				search_history.value.push(user.value);
 				localStorage.setItem(
-					"hashtag_history",
-					JSON.stringify(hashtag_history.value)
+					"search_history",
+					JSON.stringify(search_history.value)
 				);
 			}
 
-			let q = query.value;
-			q = q.replace(/#/g, "%23");
-			q = q.replace(" ", "+");
+			userDetails.value = await userInfo.value;
 
-			let exclude = " -is:retweet -is:reply";
+			let exclude = "exclude=retweets,replies&";
 			if (include.value.retweets && include.value.replies) {
 				exclude = "";
 			} else if (include.value.retweets) {
-				exclude = " -is:reply";
+				exclude = "exclude=replies&";
 			} else if (include.value.replies) {
-				exclude = " -is:retweet";
+				exclude = "exclude=retweets&";
 			}
 
-			let params = `query=${q + exclude}&max_results=${
-				num_of_results.value
-			}&tweet.fields=created_at,author_id&expansions=attachments.media_keys,author_id&media.fields=media_key,preview_image_url,url`;
+			let params = `${exclude}max_results=${num_of_results.value}&tweet.fields=id,created_at,text,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
 
 			let search_params = params;
 
@@ -162,7 +163,7 @@ export default {
 			}
 
 			await api
-				.get(`2/tweets/search/recent?${search_params}`)
+				.get(`2/users/${userDetails.value.id_str}/tweets?${search_params}`)
 				.then((res) => {
 					if (res.data.errors) {
 						message.value = res.data.errors[0].detail;
@@ -173,11 +174,9 @@ export default {
 					if (!res.data.hasOwnProperty("includes")) {
 						result_count.value += res.data.meta.result_count;
 						next_token.value = res.data.meta.next_token;
-						message.value = `No photo/video found. Try to increase number of tweets or load more`;
+						message.value = `No photo found in ${result_count.value} tweets. Try to increase number of tweets`;
 						loading.value = false;
 						return;
-					} else {
-						message.value = "";
 					}
 
 					if (res.data.hasOwnProperty("meta")) {
@@ -187,20 +186,8 @@ export default {
 						result_count.value = num_of_results.value;
 					}
 
-					let tweets = [];
+					let tweets = res.data.data;
 					let media = res.data.includes.media;
-
-					let tempTweets = res.data.data;
-					let tempUsers = res.data.includes.users;
-
-					tempTweets.forEach((x) => {
-						tempUsers.forEach((y) => {
-							if (x.author_id === y.id) {
-								delete y.id;
-								tweets.push({ ...x, ...y });
-							}
-						});
-					});
 
 					// Get tweets with photo and tweet text
 					let photoTweets = TweetsWithPhotos(tweets, media);
@@ -218,7 +205,6 @@ export default {
 						video.id = tweet.id;
 						video.text = tweet.text;
 						video.created_at = tweet.created_at;
-						video.username = tweet.username;
 						videos.value.push(video);
 					});
 
@@ -231,19 +217,20 @@ export default {
 		};
 
 		return {
-			query,
+			user,
+			userDetails,
 			num_of_results,
-			include,
 			photos,
 			videos,
+			include,
 			loading,
 			next_token,
 			result_count,
 			message,
 			getMedia,
-			hashtag_history,
+			search_history,
 			historyClick,
-			getQuery,
+			getUser,
 		};
 	},
 };

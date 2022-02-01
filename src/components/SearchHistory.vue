@@ -1,5 +1,5 @@
 <template>
-	<div v-if="search_history.length > 0" class="block my-5 leading-10">
+	<div v-if="search_history.length > 0" class="block mt-5 leading-10">
 		<span class="mr-2 font-bold">Recent Search History:</span>
 		<span class="relative" v-for="(keyword, i) in search_history" :key="i">
 			<span
@@ -7,10 +7,7 @@
 				@click.prevent="$emit('media', keyword)"
 				>{{ keyword }}
 			</span>
-			<button
-				class="absolute top-0 right-0"
-				@click.prevent="$emit('remove', i)"
-			>
+			<button class="absolute top-0 right-0" @click.prevent="removeHistory(i)">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					class="h-4 w-4 mr-1 -mt-2 text-gray-600 hover:text-red-600"
@@ -27,7 +24,7 @@
 		</span>
 		<button
 			class="border border-red-600 bg-red-500 hover:bg-red-600 text-white py-1 px-2 leading-snug"
-			@click.prevent="$emit('clear')"
+			@click.prevent="clearHistory"
 		>
 			<div class="flex items-center">
 				<svg
@@ -48,8 +45,26 @@
 	</div>
 </template>
 <script>
+import { onMounted, ref } from "vue";
 export default {
 	props: ["search_history"],
-	emits: ["media", "remove", "clear"],
+	emits: ["media"],
+	setup(props) {
+		const removeHistory = (i) => {
+			props.search_history.splice(i, 1);
+			localStorage.setItem(
+				"search_history",
+				JSON.stringify(props.search_history)
+			);
+		};
+
+		const clearHistory = () => {
+			let len = props.search_history.length;
+			localStorage.removeItem("search_history");
+			props.search_history.splice(0, len);
+		};
+
+		return { removeHistory, clearHistory };
+	},
 };
 </script>

@@ -28,6 +28,7 @@
 					<masonry :cols="4" :gutter="10">
 						<div v-for="(img, i) in photos" :key="i" class="relative">
 							<button
+								v-if="img.url"
 								@click.prevent="likePhoto(img), $emit('like', img)"
 								class="absolute bottom-2 right-2"
 							>
