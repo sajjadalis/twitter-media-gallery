@@ -1,21 +1,23 @@
 <template>
-	<TabsContent :photos="photoLikes" :videos="videoLikes" />
-
 	<div class="flex flex-row items-center space-x-1">
 		<button
 			v-if="photoLikes.length"
 			@click.prevent="clearPhotos"
 			class="w-full text-white bg-red-500 hover:bg-red-600 p-3 uppercase font-bold mb-5"
 		>
-			Clear All Photo Likes
+			Clear All Photos
 		</button>
 		<button
 			v-if="videoLikes.length"
 			@click.prevent="clearVideos"
 			class="w-full text-white bg-red-500 hover:bg-red-600 p-3 uppercase font-bold mb-5"
 		>
-			Clear All Video Likes
+			Clear All Videos
 		</button>
+	</div>
+
+	<div class="-mt-6">
+		<TabsContent :photos="photoLikes" :videos="videoLikes" />
 	</div>
 </template>
 

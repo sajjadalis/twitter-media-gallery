@@ -65,7 +65,7 @@
 						@close="showModal = false"
 						@next="nextMedia('photo')"
 						@prev="prevMedia('photo')"
-						@like="like"
+						@like="like($event, 'photo')"
 						:key="'next' + mediaIndex"
 					/>
 				</div>
@@ -134,6 +134,7 @@
 						@close="showModal = false"
 						@next="nextMedia('video')"
 						@prev="prevMedia('video')"
+						@like="like($event, 'video')"
 						:key="'next' + mediaIndex"
 					/>
 				</div>
@@ -147,12 +148,15 @@
 			</TabPanel>
 		</TabPanels>
 	</TabGroup>
+
+	<ScrollToTop v-if="photos.length || videos.length" />
 </template>
 <script>
 import { onMounted, ref } from "vue";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 import PhotoModal from "./PhotoModal.vue";
 import VideoModal from "./VideoModal.vue";
+import ScrollToTop from "./ScrollToTop.vue";
 export default {
 	props: ["photos", "videos", "user", "result_count"],
 	components: {
@@ -163,6 +167,7 @@ export default {
 		TabPanel,
 		PhotoModal,
 		VideoModal,
+		ScrollToTop,
 	},
 	setup(props) {
 		const mediaIndex = ref(null);
@@ -261,7 +266,7 @@ export default {
 				photoLikes.value.push(photo);
 				localStorage.setItem("photo_likes", JSON.stringify(photoLikes.value));
 			}
-			console.log(photoLikes.value);
+			// console.log(photoLikes.value);
 		};
 
 		const likeVideo = (video) => {
@@ -287,11 +292,17 @@ export default {
 				videoLikes.value.push(video);
 				localStorage.setItem("video_likes", JSON.stringify(videoLikes.value));
 			}
-			console.log(videoLikes.value);
+			// console.log(videoLikes.value);
 		};
 
-		const like = (e) => {
-			likePhoto(e);
+		const like = (e, type) => {
+			if (type == "photo") {
+				likePhoto(e);
+			}
+
+			if (type == "video") {
+				likeVideo(e);
+			}
 		};
 
 		return {

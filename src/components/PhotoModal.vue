@@ -300,6 +300,11 @@ export default {
 			if (showTweetText) {
 				showText.value = showTweetText;
 			}
+
+			let photos = JSON.parse(localStorage.getItem("photo_likes"));
+			if (photos) {
+				photoLikes.value = photos;
+			}
 		});
 
 		const text = () => {
@@ -369,13 +374,6 @@ export default {
 		const date = (date) => {
 			return moment(date, "YYYYMMDD").fromNow();
 		};
-
-		onMounted(() => {
-			let photos = JSON.parse(localStorage.getItem("photo_likes"));
-			if (photos) {
-				photoLikes.value = photos;
-			}
-		});
 
 		const like = () => {
 			context.emit("like", props.img);
