@@ -51,8 +51,10 @@ export default {
 		};
 
 		const clearVideos = () => {
-			localStorage.removeItem("video_likes");
-			videoLikes.value = [];
+			if (confirm("Are you sure? All videos will be cleared on likes page.")) {
+				localStorage.removeItem("video_likes");
+				videoLikes.value = [];
+			}
 		};
 
 		return {

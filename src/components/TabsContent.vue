@@ -41,7 +41,7 @@
 									stroke-width="2"
 									stroke-linecap="round"
 									stroke-linejoin="round"
-									class="h-5 w-5 text-white hover:transition-all"
+									class="h-5 w-5 text-white shadow-lg hover:transition-all"
 									:class="[
 										photoLikes.some((e) => e.media_key === img.media_key)
 											? 'fill-red-500 text-red-500 hover:text-red-500'

@@ -213,7 +213,7 @@
 			</button>
 
 			<button
-				class="hover:text-white absolute top-0 right-0 mt-28 mr-4 z-50"
+				class="hover:text-white absolute top-0 right-0 mt-24 mr-4 z-50"
 				@click="like"
 				v-tippy="'Like'"
 			>
@@ -227,11 +227,11 @@
 					stroke-width="2"
 					stroke-linecap="round"
 					stroke-linejoin="round"
-					class="h-8 w-8 text-white"
+					class="h-8 w-8 text-gray-400"
 					:class="[
 						photoLikes.some((e) => e.media_key === img.media_key) || liked
 							? 'fill-red-500 text-red-500 hover:text-red-500'
-							: 'hover:text-gray-300',
+							: 'hover:text-white',
 					]"
 				>
 					<path

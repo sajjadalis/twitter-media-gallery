@@ -1,66 +1,11 @@
 <template>
-	<form @submit.prevent="getMedia()" class="flex">
-		<div class="relative flex-1 mr-2">
-			<input
-				type="text"
-				name="twt_usr"
-				data-lpignore="true"
-				placeholder="#hashtag / #multiple #hashtags / simple keyword"
-				class="w-full focus:shadow-red-500"
-				v-model="query"
-			/>
-			<span
-				class="absolute top-0 right-0 mt-3 mr-3 text-gray-400 hover:text-gray-600 cursor-pointer"
-				@click.prevent="query = ''"
-			>
-				<svg
-					v-if="query"
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5"
-					viewBox="0 0 20 20"
-					fill="currentColor"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-						clip-rule="evenodd"
-					/>
-				</svg>
-			</span>
-		</div>
-		<div class="w-40 mr-2">
-			<input
-				type="number"
-				class="w-full"
-				placeholder="Tweets (5 to 100)"
-				v-model="num_of_results"
-			/>
-		</div>
-		<div class="relative mr-2">
-			<label class="absolute top-0 -mt-5 text-2xs">Retweets</label>
-			<input
-				type="checkbox"
-				v-model="include.retweets"
-				class="text-red-500 w-10 h-10"
-			/>
-		</div>
-		<div class="relative mr-2">
-			<label class="absolute top-0 -mt-5 text-2xs">Replies</label>
-			<input
-				type="checkbox"
-				v-model="include.replies"
-				class="text-red-500 w-10 h-10"
-			/>
-		</div>
-		<div class="w-40">
-			<button
-				type="submit"
-				class="uppercase font-bold bg-red-500 text-white py-2 px-4 w-full"
-			>
-				Get Media
-			</button>
-		</div>
-	</form>
+	<Form
+		v-model="query"
+		:num_of_results="num_of_results"
+		:include="include"
+		placeholder="#hashtag / #multiple #hashtags / simple keyword"
+		@search="getMedia()"
+	/>
 
 	<SearchHistory
 		:search_history="hashtag_history"
@@ -107,6 +52,7 @@
 import { onMounted, ref } from "vue";
 import SearchHistory from "../components/SearchHistory.vue";
 import TabsContent from "../components/TabsContent.vue";
+import Form from "../components/Form.vue";
 import api from "../composeables/api";
 import TweetsWithVideo from "../composeables/TweetsWithVideo";
 import TweetsWithPhotos from "../composeables/TweetsWithPhotos";
@@ -116,6 +62,7 @@ export default {
 	components: {
 		TabsContent,
 		SearchHistory,
+		Form,
 	},
 	setup() {
 		const query = ref("#meme");
