@@ -9,6 +9,12 @@
 
 	<SearchHistory :search_history="hashtag_history" @media="historyClick" />
 
+	<CacheNotification
+		:cache="cache"
+		:cached_on="cached_on"
+		@refresh="getMedia"
+	/>
+
 	<TabsContent
 		:photos="photos"
 		:videos="videos"
@@ -45,20 +51,25 @@
 
 <script>
 import { useRoute, useRouter } from "vue-router";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, reactive } from "vue";
+
+import Form from "../components/Form.vue";
 import SearchHistory from "../components/SearchHistory.vue";
 import TabsContent from "../components/TabsContent.vue";
-import Form from "../components/Form.vue";
+import CacheNotification from "../components/CacheNotification.vue";
+
 import api from "../composeables/api";
 import TweetsWithVideo from "../composeables/TweetsWithVideo";
 import TweetsWithPhotos from "../composeables/TweetsWithPhotos";
 import getVideo from "../composeables/getVideo";
+import getData from "../composeables/getData";
 
 export default {
 	components: {
-		TabsContent,
-		SearchHistory,
 		Form,
+		SearchHistory,
+		TabsContent,
+		CacheNotification,
 	},
 	setup() {
 		const router = useRouter();
@@ -66,13 +77,19 @@ export default {
 		const query = ref(route.query.q);
 		const num_of_results = ref(50);
 		const include = ref({ retweets: false, replies: true });
-		const photos = ref([]);
-		const videos = ref([]);
-		const next_token = ref(null);
-		const result_count = ref(0);
 		const message = ref(null);
 		const loading = ref(false);
 		const hashtag_history = ref([]);
+
+		const {
+			localData,
+			cache,
+			cached_on,
+			next_token,
+			photos,
+			videos,
+			result_count,
+		} = getData();
 
 		onMounted(async () => {
 			let history = JSON.parse(localStorage.getItem("hashtag_history"));
@@ -82,7 +99,7 @@ export default {
 			}
 
 			if (query.value) {
-				await getMedia();
+				localData(query.value, getMedia);
 			}
 		});
 
@@ -92,7 +109,7 @@ export default {
 				query: { q: val },
 			});
 			query.value = val;
-			await getMedia();
+			localData(query.value, getMedia);
 		};
 
 		const getQuery = async () => {
@@ -100,10 +117,12 @@ export default {
 				name: "search",
 				query: { q: query.value },
 			});
-			await getMedia();
+			// await getMedia();
+			localData(query.value, getMedia);
 		};
 
 		const getMedia = async (token) => {
+			cache.value = false;
 			loading.value = true;
 
 			// Display error if number of tweets are less than 5.
@@ -211,15 +230,27 @@ export default {
 					// Get tweet id's which contains video and animated gif's
 					let videoTweets = TweetsWithVideo(tweets, media);
 
+					const search = reactive({});
+
 					// Make api request for each tweet via tweet id & get videos data
 					// Add each video object to videos array
-					videoTweets.forEach(async (tweet) => {
+					var videosProcessed = 0;
+					videoTweets.forEach(async (tweet, index, array) => {
 						let video = await getVideo(tweet.id);
 						video.id = tweet.id;
 						video.text = tweet.text;
 						video.created_at = tweet.created_at;
 						video.username = tweet.username;
 						videos.value.push(video);
+
+						videosProcessed++;
+						if (videosProcessed === array.length) {
+							search.cached_on = new Date();
+							search.tweets_count = result_count.value;
+							search.photos = photos.value;
+							search.videos = videos.value;
+							localStorage.setItem(query.value, JSON.stringify(search));
+						}
 					});
 
 					loading.value = false;
@@ -240,10 +271,12 @@ export default {
 			next_token,
 			result_count,
 			message,
-			getMedia,
+			cache,
+			cached_on,
 			hashtag_history,
 			historyClick,
 			getQuery,
+			getMedia,
 		};
 	},
 };

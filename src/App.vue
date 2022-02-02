@@ -33,7 +33,7 @@
 							<circle cx="12" cy="7" r="4"></circle>
 						</svg>
 
-						User Timeline</router-link
+						User</router-link
 					>
 					<router-link class="px-3 py-2 flex flex-row items-center" to="/search"
 						><svg

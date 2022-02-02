@@ -56,8 +56,20 @@
 		<div class="w-full lg:w-40 mt-3 lg:mt-0 mx-auto">
 			<button
 				type="submit"
-				class="uppercase font-bold bg-red-500 text-white py-2 px-4 w-full"
+				class="uppercase font-bold bg-red-500 hover:bg-red-600 text-white py-2 px-4 w-full flex flex-row items-center"
 			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-5 w-5 mr-1"
+					viewBox="0 0 20 20"
+					fill="currentColor"
+				>
+					<path
+						fill-rule="evenodd"
+						d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+						clip-rule="evenodd"
+					/>
+				</svg>
 				Get Media
 			</button>
 		</div>

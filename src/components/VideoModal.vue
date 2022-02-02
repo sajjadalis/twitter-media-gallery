@@ -192,7 +192,7 @@ export default {
 		};
 
 		const date = (date) => {
-			return moment(date, "YYYYMMDD").fromNow();
+			return moment(date).fromNow();
 		};
 
 		const like = () => {
