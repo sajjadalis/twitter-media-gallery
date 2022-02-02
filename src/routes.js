@@ -4,8 +4,8 @@ import Search from "./pages/Search.vue";
 import Likes from "./pages/Likes.vue";
 
 const routes = [
-	{ path: "/", component: User },
-	{ path: "/:user", component: User, name: "user" },
+	{ path: "/", component: User, name: "user" },
+	// { path: "/:user", component: User },
 	{ path: "/search", component: Search, name: "search" },
 	{ path: "/likes", component: Likes },
 ];

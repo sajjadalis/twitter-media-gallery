@@ -12,7 +12,7 @@ const getData = () => {
 
 	const localData = async (username, callback) => {
 		let data = JSON.parse(localStorage.getItem(username));
-		console.log(data);
+		// console.log(data);
 
 		if (data) {
 			cache.value = true;

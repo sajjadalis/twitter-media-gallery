@@ -79,7 +79,7 @@ export default {
 		const route = useRoute();
 		const num_of_results = ref(50);
 		const include = ref({ retweets: false, replies: true });
-		const user = ref(route.params.user);
+		const user = ref(route.query.u);
 		const search_history = ref([]);
 		const message = ref(null);
 		const loading = ref(false);
@@ -110,7 +110,7 @@ export default {
 		const historyClick = async (val) => {
 			router.push({
 				name: "user",
-				params: { user: val },
+				query: { u: val },
 			});
 			user.value = val;
 			localData(user.value, getMedia);
@@ -119,7 +119,7 @@ export default {
 		const getUser = async () => {
 			router.push({
 				name: "user",
-				params: { user: user.value },
+				query: { u: user.value },
 			});
 			// await getMedia();
 			localData(user.value, getMedia);

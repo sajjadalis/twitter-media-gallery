@@ -1,10 +1,10 @@
 <template>
 	<div
-		class="mt-5 w-full bg-slate-100 text-slate-800 p-2 font-bold text-lg flex items-center justify-between font-mono uppercase"
+		class="mt-5 w-full bg-slate-100 text-slate-800 p-2 font-bold text-lg flex items-center justify-between uppercase"
 		v-if="cache"
 	>
 		<span class="ml-2"
-			>Data is being pulled from local storage. Cached:
+			>Data is being pulled from local storage. Last Cached:
 			<span class="text-indigo-500">{{ cached_on }}</span></span
 		>
 		<button
