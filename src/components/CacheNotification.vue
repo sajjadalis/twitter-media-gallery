@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="mt-5 w-full bg-slate-100 text-slate-800 p-2 font-bold text-lg flex items-center justify-between uppercase"
+		class="mt-5 w-full bg-slate-100 text-slate-600 p-4 font-bold text-lg flex items-center justify-between uppercase"
 		v-if="cache"
 	>
 		<span class="ml-2"
@@ -8,7 +8,7 @@
 			<span class="text-indigo-500">{{ cached_on }}</span></span
 		>
 		<button
-			class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold uppercase px-3 py-1 flex flex-row items-center ml-3"
+			class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold uppercase px-4 py-2 flex flex-row items-center ml-3"
 			@click.prevent="$emit('refresh')"
 		>
 			<svg

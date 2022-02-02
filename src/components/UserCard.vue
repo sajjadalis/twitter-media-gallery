@@ -1,8 +1,11 @@
 <template>
 	<div class="font-sans leading-tight bg-grey-lighter mt-5">
 		<div class="mx-auto bg-white overflow-hidden">
-			<div class="bg-cover bg-center bg-gray-200">
-				<a :href="user.profile_banner_url" target="_blank"
+			<div class="bg-cover bg-center bg-gray-200 h-80">
+				<a
+					v-if="user.profile_banner_url"
+					:href="user.profile_banner_url"
+					target="_blank"
 					><img class="object-cover w-full h-80" :src="user.profile_banner_url"
 				/></a>
 			</div>

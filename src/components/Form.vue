@@ -56,7 +56,7 @@
 		<div class="w-full lg:w-40 mt-3 lg:mt-0 mx-auto">
 			<button
 				type="submit"
-				class="uppercase font-bold bg-red-500 hover:bg-red-600 text-white py-2 px-4 w-full flex flex-row items-center"
+				class="uppercase font-bold text-lg bg-red-500 hover:bg-red-600 text-white py-2 px-4 w-full flex flex-row items-center leading-snug"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
