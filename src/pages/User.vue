@@ -9,6 +9,31 @@
 
 	<SearchHistory :search_history="search_history" @media="historyClick" />
 
+	<div
+		class="mt-5 w-full bg-slate-100 text-slate-800 p-2 font-bold text-lg flex items-center justify-between uppercase"
+		v-if="cache"
+	>
+		<span>Data is being loaded from local storage cache</span>
+		<button
+			class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold uppercase px-3 py-1 flex flex-row items-center ml-3"
+			@click.prevent="getUser()"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-5 w-5 mr-1"
+				viewBox="0 0 20 20"
+				fill="currentColor"
+			>
+				<path
+					fill-rule="evenodd"
+					d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+					clip-rule="evenodd"
+				/>
+			</svg>
+			Refresh Data
+		</button>
+	</div>
+
 	<UserCard v-if="Object.keys(userDetails).length !== 0" :user="userDetails" />
 
 	<TabsContent
@@ -46,7 +71,7 @@
 </template>
 <script>
 import { useRoute, useRouter } from "vue-router";
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import Form from "../components/Form.vue";
 import SearchHistory from "../components/SearchHistory.vue";
 import UserCard from "../components/UserCard.vue";
@@ -76,16 +101,42 @@ export default {
 		const next_token = ref(null);
 		const result_count = ref(0);
 		const message = ref(null);
+		const cache = ref(false);
 		const loading = ref(false);
 
-		onMounted(async () => {
+		const localData = async (username) => {
+			let data = JSON.parse(localStorage.getItem(username));
+			console.log(data);
+
+			if (data) {
+				cache.value = true;
+				next_token.value = null;
+				if (data.tweets) {
+					result_count.value = data.tweets;
+				}
+				if (data.user) {
+					userDetails.value = data.user;
+				}
+				if (data.photos) {
+					photos.value = data.photos;
+				}
+				if (data.videos) {
+					videos.value = data.videos;
+				}
+			} else {
+				await getMedia();
+			}
+		};
+
+		onMounted(() => {
 			let history = JSON.parse(localStorage.getItem("search_history"));
 
 			if (history) {
 				search_history.value = history;
 			}
+
 			if (user.value) {
-				await getMedia();
+				localData(user.value);
 			}
 		});
 
@@ -95,7 +146,7 @@ export default {
 				params: { user: val },
 			});
 			user.value = val;
-			await getMedia();
+			localData(user.value);
 		};
 
 		const getUser = async () => {
@@ -109,6 +160,7 @@ export default {
 		const { userInfo, error, loadUserID } = getUserInfo();
 
 		const getMedia = async (token) => {
+			cache.value = false;
 			loading.value = true;
 
 			// Display error if number of tweets are less than 5.
@@ -198,14 +250,26 @@ export default {
 					// Get tweet id's which contains video and animated gif's
 					let videoTweets = TweetsWithVideo(tweets, media);
 
+					const userData = reactive({});
+
 					// Make api request for each tweet via tweet id & get videos data
 					// Add each video object to videos array
-					videoTweets.forEach(async (tweet) => {
+					var videosProcessed = 0;
+					videoTweets.forEach(async (tweet, index, array) => {
 						let video = await getVideo(tweet.id);
 						video.id = tweet.id;
 						video.text = tweet.text;
 						video.created_at = tweet.created_at;
 						videos.value.push(video);
+
+						videosProcessed++;
+						if (videosProcessed === array.length) {
+							userData.tweets = result_count.value;
+							userData.user = userDetails.value;
+							userData.photos = photos.value;
+							userData.videos = videos.value;
+							localStorage.setItem(user.value, JSON.stringify(userData));
+						}
 					});
 
 					loading.value = false;
@@ -214,6 +278,15 @@ export default {
 					error.value = err.message;
 					console.log(error.value);
 				});
+			// .then(() => {
+			// 	console.log(videos.value);
+			// 	let userData = { photos: photos.value, videos: videos.value };
+			// 	// userData.photos = ;
+			// 	// userData.videos = ;
+			// 	localStorage.setItem(user.value, JSON.stringify(userData));
+			// 	let items = JSON.parse(localStorage.getItem(user.value));
+			// 	console.log(items);
+			// });
 		};
 
 		return {
@@ -227,10 +300,11 @@ export default {
 			next_token,
 			result_count,
 			message,
-			getMedia,
+			cache,
 			search_history,
 			historyClick,
 			getUser,
+			getMedia,
 		};
 	},
 };
