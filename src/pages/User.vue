@@ -77,7 +77,7 @@ export default {
 	setup() {
 		const router = useRouter();
 		const route = useRoute();
-		const num_of_results = ref(50);
+		const num_of_results = ref(100);
 		const include = ref({ retweets: false, replies: true });
 		const user = ref(route.query.u);
 		const search_history = ref([]);
@@ -103,7 +103,7 @@ export default {
 			}
 
 			if (user.value) {
-				localData(user.value, getMedia);
+				localData(user.value, "user", getMedia);
 			}
 		});
 
@@ -113,7 +113,7 @@ export default {
 				query: { u: val },
 			});
 			user.value = val;
-			localData(user.value, getMedia);
+			localData(user.value, "user", getMedia);
 		};
 
 		const getUser = async () => {
@@ -122,7 +122,7 @@ export default {
 				query: { u: user.value },
 			});
 			// await getMedia();
-			localData(user.value, getMedia);
+			localData(user.value, "user", getMedia);
 		};
 
 		const { userInfo, error, loadUserID } = getUserInfo();
@@ -153,6 +153,12 @@ export default {
 				userDetails.value = {};
 				result_count.value = 0;
 				await loadUserID(user.value);
+			}
+
+			if (!userInfo.value) {
+				loading.value = false;
+				message.value = "Error. User not found";
+				return;
 			}
 
 			if (search_history.value && !search_history.value.includes(user.value)) {
@@ -218,28 +224,43 @@ export default {
 					// Get tweet id's which contains video and animated gif's
 					let videoTweets = TweetsWithVideo(tweets, media);
 
+					// console.log(videoTweets);
+
 					const userData = reactive({});
 
 					// Make api request for each tweet via tweet id & get videos data
 					// Add each video object to videos array
-					var videosProcessed = 0;
-					videoTweets.forEach(async (tweet, index, array) => {
-						let video = await getVideo(tweet.id);
-						video.id = tweet.id;
-						video.text = tweet.text;
-						video.created_at = tweet.created_at;
-						videos.value.push(video);
+					if (videoTweets.length > 0) {
+						var videosProcessed = 0;
 
-						videosProcessed++;
-						if (videosProcessed === array.length) {
-							userData.cached_on = new Date();
-							userData.tweets_count = result_count.value;
-							userData.user = userDetails.value;
-							userData.photos = photos.value;
-							userData.videos = videos.value;
-							localStorage.setItem(user.value, JSON.stringify(userData));
-						}
-					});
+						videoTweets.forEach(async (tweet, index, array) => {
+							let video = await getVideo(tweet.id);
+							video.id = tweet.id;
+							video.text = tweet.text;
+							video.created_at = tweet.created_at;
+							videos.value.push(video);
+
+							videosProcessed++;
+							if (videosProcessed === array.length) {
+								userData.cached_on = new Date();
+								userData.tweets_count = result_count.value;
+								userData.user = userDetails.value;
+								userData.photos = photos.value;
+								userData.videos = videos.value;
+								localStorage.setItem(
+									"u_" + user.value,
+									JSON.stringify(userData)
+								);
+							}
+						});
+					} else {
+						userData.cached_on = new Date();
+						userData.tweets_count = result_count.value;
+						userData.user = userDetails.value;
+						userData.photos = photos.value;
+						userData.videos = videos.value;
+						localStorage.setItem("u_" + user.value, JSON.stringify(userData));
+					}
 
 					loading.value = false;
 				})

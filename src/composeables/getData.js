@@ -10,8 +10,16 @@ const getData = () => {
 	const next_token = ref(null);
 	const result_count = ref(0);
 
-	const localData = async (username, callback) => {
-		let data = JSON.parse(localStorage.getItem(username));
+	const localData = async (username, type, callback) => {
+		let data;
+		if (type == "user") {
+			data = JSON.parse(localStorage.getItem("u_" + username));
+		}
+
+		if (type == "search") {
+			data = JSON.parse(localStorage.getItem("q_" + username));
+		}
+
 		// console.log(data);
 
 		if (data) {

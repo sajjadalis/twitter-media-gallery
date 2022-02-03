@@ -75,7 +75,7 @@ export default {
 		const router = useRouter();
 		const route = useRoute();
 		const query = ref(route.query.q);
-		const num_of_results = ref(50);
+		const num_of_results = ref(100);
 		const include = ref({ retweets: false, replies: true });
 		const message = ref(null);
 		const loading = ref(false);
@@ -99,7 +99,7 @@ export default {
 			}
 
 			if (query.value) {
-				localData(query.value, getMedia);
+				localData(query.value, "search", getMedia);
 			}
 		});
 
@@ -109,7 +109,7 @@ export default {
 				query: { q: val },
 			});
 			query.value = val;
-			localData(query.value, getMedia);
+			localData(query.value, "search", getMedia);
 		};
 
 		const getQuery = async () => {
@@ -118,7 +118,7 @@ export default {
 				query: { q: query.value },
 			});
 			// await getMedia();
-			localData(query.value, getMedia);
+			localData(query.value, "search", getMedia);
 		};
 
 		const getMedia = async (token) => {
@@ -234,24 +234,35 @@ export default {
 
 					// Make api request for each tweet via tweet id & get videos data
 					// Add each video object to videos array
-					var videosProcessed = 0;
-					videoTweets.forEach(async (tweet, index, array) => {
-						let video = await getVideo(tweet.id);
-						video.id = tweet.id;
-						video.text = tweet.text;
-						video.created_at = tweet.created_at;
-						video.username = tweet.username;
-						videos.value.push(video);
+					if (videoTweets.length > 0) {
+						var videosProcessed = 0;
+						videoTweets.forEach(async (tweet, index, array) => {
+							let video = await getVideo(tweet.id);
+							video.id = tweet.id;
+							video.text = tweet.text;
+							video.created_at = tweet.created_at;
+							video.username = tweet.username;
+							videos.value.push(video);
 
-						videosProcessed++;
-						if (videosProcessed === array.length) {
-							search.cached_on = new Date();
-							search.tweets_count = result_count.value;
-							search.photos = photos.value;
-							search.videos = videos.value;
-							localStorage.setItem(query.value, JSON.stringify(search));
-						}
-					});
+							videosProcessed++;
+							if (videosProcessed === array.length) {
+								search.cached_on = new Date();
+								search.tweets_count = result_count.value;
+								search.photos = photos.value;
+								search.videos = videos.value;
+								localStorage.setItem(
+									"q_" + query.value,
+									JSON.stringify(search)
+								);
+							}
+						});
+					} else {
+						search.cached_on = new Date();
+						search.tweets_count = result_count.value;
+						search.photos = photos.value;
+						search.videos = videos.value;
+						localStorage.setItem("q_" + query.value, JSON.stringify(search));
+					}
 
 					loading.value = false;
 				})

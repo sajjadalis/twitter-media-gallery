@@ -7,7 +7,10 @@
 				@click.prevent="$emit('media', keyword)"
 				>{{ keyword }}
 			</span>
-			<button class="absolute top-0 right-0" @click.prevent="removeHistory(i)">
+			<button
+				class="absolute top-0 right-0"
+				@click.prevent="removeHistory(i, keyword)"
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					class="h-4 w-4 mr-1 -mt-2 text-slate-600 hover:text-red-600"
@@ -49,12 +52,14 @@ export default {
 	props: ["search_history"],
 	emits: ["media"],
 	setup(props) {
-		const removeHistory = (i) => {
+		const removeHistory = (i, keyword) => {
 			props.search_history.splice(i, 1);
 			localStorage.setItem(
 				"search_history",
 				JSON.stringify(props.search_history)
 			);
+
+			localStorage.removeItem(keyword);
 		};
 
 		const clearHistory = () => {
