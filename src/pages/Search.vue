@@ -7,7 +7,11 @@
 		@search="getQuery()"
 	/>
 
-	<SearchHistory :search_history="hashtag_history" @media="historyClick" />
+	<SearchHistory
+		:history="hashtag_history"
+		type="hashtag_history"
+		@media="historyClick"
+	/>
 
 	<CacheNotification
 		:cache="cache"

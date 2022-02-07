@@ -1,7 +1,7 @@
 <template>
-	<div v-if="search_history.length > 0" class="block mt-5 leading-10">
+	<div v-if="history.length > 0" class="block mt-5 leading-10">
 		<span class="mr-2 font-bold">Recent Search History:</span>
-		<span class="relative" v-for="(keyword, i) in search_history" :key="i">
+		<span class="relative" v-for="(keyword, i) in history" :key="i">
 			<span
 				class="border bg-slate-100 hover:bg-slate-200 py-1 px-2 mr-2 cursor-pointer"
 				@click.prevent="$emit('media', keyword)"
@@ -49,23 +49,25 @@
 </template>
 <script>
 export default {
-	props: ["search_history"],
+	props: ["history", "type"],
 	emits: ["media"],
 	setup(props) {
 		const removeHistory = (i, keyword) => {
-			props.search_history.splice(i, 1);
-			localStorage.setItem(
-				"search_history",
-				JSON.stringify(props.search_history)
-			);
+			props.history.splice(i, 1);
+			localStorage.setItem(props.type, JSON.stringify(props.history));
+			if (props.type == "user_history") {
+				localStorage.removeItem("u_" + keyword);
+			}
 
-			localStorage.removeItem(keyword);
+			if (props.type == "search_history") {
+				localStorage.removeItem("q_" + keyword);
+			}
 		};
 
 		const clearHistory = () => {
-			let len = props.search_history.length;
-			localStorage.removeItem("search_history");
-			props.search_history.splice(0, len);
+			let len = props.history.length;
+			localStorage.removeItem(props.type);
+			props.history.splice(0, len);
 		};
 
 		return { removeHistory, clearHistory };

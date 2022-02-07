@@ -7,7 +7,11 @@
 		@search="getUser()"
 	/>
 
-	<SearchHistory :search_history="search_history" @media="historyClick" />
+	<SearchHistory
+		:history="user_history"
+		type="user_history"
+		@media="historyClick"
+	/>
 
 	<CacheNotification
 		:cache="cache"
@@ -80,7 +84,7 @@ export default {
 		const num_of_results = ref(100);
 		const include = ref({ retweets: false, replies: true });
 		const user = ref(route.query.u);
-		const search_history = ref([]);
+		const user_history = ref([]);
 		const message = ref(null);
 		const loading = ref(false);
 
@@ -96,10 +100,10 @@ export default {
 		} = getData();
 
 		onMounted(() => {
-			let history = JSON.parse(localStorage.getItem("search_history"));
+			let history = JSON.parse(localStorage.getItem("user_history"));
 
 			if (history) {
-				search_history.value = history;
+				user_history.value = history;
 			}
 
 			if (user.value) {
@@ -161,11 +165,11 @@ export default {
 				return;
 			}
 
-			if (search_history.value && !search_history.value.includes(user.value)) {
-				search_history.value.push(user.value);
+			if (user_history.value && !user_history.value.includes(user.value)) {
+				user_history.value.push(user.value);
 				localStorage.setItem(
-					"search_history",
-					JSON.stringify(search_history.value)
+					"user_history",
+					JSON.stringify(user_history.value)
 				);
 			}
 
@@ -283,7 +287,7 @@ export default {
 			message,
 			cache,
 			cached_on,
-			search_history,
+			user_history,
 			historyClick,
 			getUser,
 			getMedia,
