@@ -3,7 +3,7 @@
 		<span class="mr-2 font-bold">Recent Search History:</span>
 		<span class="relative" v-for="(keyword, i) in history" :key="i">
 			<span
-				class="border bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-900 py-1 px-2 mr-2 cursor-pointer"
+				class="border bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-900 py-1 px-2 mr-2 cursor-pointer"
 				@click.prevent="$emit('media', keyword)"
 				>{{ keyword }}
 			</span>

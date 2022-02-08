@@ -1,7 +1,7 @@
 <template>
 	<div class="font-sans leading-tight bg-grey-lighter mt-5">
-		<div class="mx-auto bg-white dark:bg-gray-800 overflow-hidden">
-			<div class="bg-cover bg-center bg-gray-200 dark:bg-gray-700 h-80">
+		<div class="mx-auto bg-white dark:bg-zinc-800 overflow-hidden">
+			<div class="bg-cover bg-center bg-gray-200 dark:bg-zinc-700 h-80">
 				<a
 					v-if="user.profile_banner_url"
 					:href="user.profile_banner_url"
@@ -49,7 +49,7 @@
 
 				<div class="text-right mt-1">
 					<div
-						class="py-2 flex items-center text-sm text-gray-700 dark:text-gray-100"
+						class="py-2 flex items-center text-sm text-zinc-700 dark:text-gray-100"
 					>
 						<span class="mr-3">
 							<strong>{{ numFormatter(user.friends_count) }}</strong> Following

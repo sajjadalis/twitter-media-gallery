@@ -82,7 +82,7 @@
 							v-model="isDark"
 							:class="
 								isDark
-									? 'bg-gray-800 border-gray-700'
+									? 'bg-zinc-800 border-zinc-700'
 									: 'bg-slate-100 border-slate-200'
 							"
 							class="ml-2 relative inline-flex flex-shrink-0 h-[32px] w-[64px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
@@ -92,7 +92,7 @@
 								aria-hidden="true"
 								:class="
 									isDark
-										? 'bg-gray-700 translate-x-9'
+										? 'bg-zinc-700 translate-x-9'
 										: 'translate-x-0 bg-slate-200'
 								"
 								class="pointer-events-none inline-block h-[28px] w-[28px] rounded-full shadow-lg transform ring-0 transition ease-in-out duration-200 p-1"

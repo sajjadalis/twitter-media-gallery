@@ -1,12 +1,12 @@
 <template>
 	<transition name="popup" type="animation">
 		<div
-			class="overlay fixed top-0 left-0 bottom-0 right-0 z-10 bg-gray-900 w-full h-screen bg-opacity-80"
+			class="overlay fixed top-0 left-0 bottom-0 right-0 z-10 bg-zinc-900 w-full h-screen bg-opacity-80"
 			@click="close"
 		>
 			<div v-if="showText == 'true'" class="fixed top-0 w-full z-40">
 				<div
-					class="bg-gray-900 text-white text-sm text-center p-3 bg-opacity-70 mx-24"
+					class="bg-zinc-900 text-white text-sm text-center p-3 bg-opacity-70 mx-24"
 				>
 					<a
 						v-if="video.username"

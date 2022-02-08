@@ -32,10 +32,10 @@
 	cursor: pointer;
 }
 body.dark {
-	@apply bg-gray-900
+	@apply bg-zinc-900
 }
 .router-link-exact-active {
-	@apply bg-slate-100 dark:bg-gray-800
+	@apply bg-slate-100 dark:bg-zinc-800
 }
 
 .spinner {

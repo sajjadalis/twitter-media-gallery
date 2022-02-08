@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="mt-5 w-full bg-slate-100 text-slate-600 dark:bg-gray-800 dark:text-gray-100 p-4 font-bold text-lg flex items-center justify-between uppercase"
+		class="mt-5 w-full bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-gray-100 p-4 font-bold text-lg flex items-center justify-between uppercase"
 		v-if="cache"
 	>
 		<span class="ml-2"
