@@ -36,7 +36,7 @@
 	</div>
 
 	<div
-		class="my-5 w-full text-red-500 border-4 border-red-500 text-center p-2 font-bold text-lg"
+		class="mt-5 w-full text-red-500 border-4 border-red-500 text-center p-2 font-bold text-lg"
 		v-if="photos.length || videos.length"
 	>
 		<span v-if="photos.length">{{ photos.length }} photos</span>

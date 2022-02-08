@@ -1,7 +1,7 @@
 <template>
 	<div class="font-sans leading-tight bg-grey-lighter mt-5">
-		<div class="mx-auto bg-white overflow-hidden">
-			<div class="bg-cover bg-center bg-gray-200 h-80">
+		<div class="mx-auto bg-white dark:bg-gray-800 overflow-hidden">
+			<div class="bg-cover bg-center bg-gray-200 dark:bg-gray-700 h-80">
 				<a
 					v-if="user.profile_banner_url"
 					:href="user.profile_banner_url"
@@ -40,7 +40,7 @@
 							<a
 								:href="'https://twitter.com/' + user.screen_name"
 								target="_blank"
-								class="hover:text-gray-500"
+								class="hover:text-gray-500 dark:hover:text-gray-300"
 								>@{{ user.screen_name }}</a
 							>
 						</div>
@@ -48,7 +48,9 @@
 				</div>
 
 				<div class="text-right mt-1">
-					<div class="py-2 flex items-center text-sm text-gray-700">
+					<div
+						class="py-2 flex items-center text-sm text-gray-700 dark:text-gray-100"
+					>
 						<span class="mr-3">
 							<strong>{{ numFormatter(user.friends_count) }}</strong> Following
 						</span>
@@ -76,7 +78,7 @@
 						<span v-if="user.entities.url" class="mr-3">
 							<a
 								:href="user.entities.url.urls[0].expanded_url"
-								class="flex items-center hover:text-gray-500"
+								class="flex items-center hover:text-gray-500 dark:hover:text-gray-300"
 								target="_blank"
 							>
 								<svg

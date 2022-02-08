@@ -3,7 +3,7 @@
 		<span class="mr-2 font-bold">Recent Search History:</span>
 		<span class="relative" v-for="(keyword, i) in history" :key="i">
 			<span
-				class="border bg-slate-100 hover:bg-slate-200 py-1 px-2 mr-2 cursor-pointer"
+				class="border bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-900 py-1 px-2 mr-2 cursor-pointer"
 				@click.prevent="$emit('media', keyword)"
 				>{{ keyword }}
 			</span>
@@ -13,7 +13,7 @@
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 mr-1 -mt-2 text-slate-600 hover:text-red-600"
+					class="h-4 w-4 mr-1 -mt-2 text-slate-600 dark:text-gray-100 hover:text-red-600"
 					viewBox="0 0 20 20"
 					fill="currentColor"
 				>

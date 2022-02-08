@@ -5,7 +5,9 @@
 				<button
 					:class="[
 						'w-full py-2.5 text-lg font-bold uppercase leading-5 text-orange-500 focus:outline-none',
-						selected ? 'bg-white shadow' : 'text-orange-50 hover:text-white',
+						selected
+							? 'bg-white dark:bg-gray-900 shadow'
+							: 'text-orange-50 hover:text-white',
 					]"
 				>
 					Photos <span v-if="photos.length">({{ photos.length }})</span>
@@ -15,7 +17,9 @@
 				><button
 					:class="[
 						'w-full py-2.5 text-lg font-bold uppercase leading-5 text-red-500 focus:outline-none',
-						selected ? 'bg-white shadow' : 'text-red-50 hover:text-white',
+						selected
+							? 'bg-white dark:bg-gray-900 shadow'
+							: 'text-red-50 hover:text-white',
 					]"
 				>
 					Videos <span v-if="videos.length">({{ videos.length }})</span>

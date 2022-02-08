@@ -5,7 +5,7 @@
 				type="text"
 				data-lpignore="true"
 				:placeholder="placeholder"
-				class="w-full focus:shadow-red-500"
+				class="w-full focus:shadow-red-500 dark:bg-gray-800 dark:border-gray-700"
 				v-model="message"
 			/>
 			<span
@@ -31,7 +31,7 @@
 			<div class="mr-2 w-80 lg:w-40">
 				<input
 					type="number"
-					class="w-full"
+					class="w-full dark:bg-gray-800 dark:border-gray-700"
 					placeholder="Tweets (5 to 100)"
 					v-model="num_of_results"
 				/>
@@ -41,7 +41,7 @@
 				<input
 					type="checkbox"
 					v-model="include.retweets"
-					class="text-red-500 w-10 h-10"
+					class="text-red-500 w-10 h-10 dark:bg-gray-800 dark:border-gray-700"
 				/>
 			</div>
 			<div class="relative mr-2">
@@ -49,7 +49,7 @@
 				<input
 					type="checkbox"
 					v-model="include.replies"
-					class="text-red-500 w-10 h-10"
+					class="text-red-500 w-10 h-10 dark:bg-gray-800 dark:border-gray-700"
 				/>
 			</div>
 		</div>
