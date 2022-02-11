@@ -10,21 +10,21 @@ const getData = () => {
 	const next_token = ref(null);
 	const result_count = ref(0);
 
-	const localData = async (username, type, callback) => {
+	const localData = async (query, type, callback) => {
 		let data;
 		if (type == "user") {
-			data = JSON.parse(localStorage.getItem("u_" + username));
+			data = JSON.parse(localStorage.getItem("u_" + query));
 		}
 
 		if (type == "search") {
-			data = JSON.parse(localStorage.getItem("q_" + username));
+			data = JSON.parse(localStorage.getItem("q_" + query));
 		}
 
 		// console.log(data);
-
 		if (data) {
 			cache.value = true;
 			next_token.value = null;
+
 			if (data.cached_on) {
 				cached_on.value = moment(data.cached_on).fromNow();
 			}

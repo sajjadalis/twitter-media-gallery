@@ -166,19 +166,19 @@ export default {
 		onMounted(() => {
 			let dark = localStorage.getItem("isDark");
 			if (dark == "true") {
-				document.body.classList.add("dark");
+				document.documentElement.classList.add("dark");
 				isDark.value = true;
 			} else {
-				document.body.classList.remove("dark");
+				document.documentElement.classList.remove("dark");
 			}
 		});
 
 		watch(isDark, (val) => {
 			if (val) {
-				document.body.classList.add("dark");
+				document.documentElement.classList.add("dark");
 				localStorage.setItem("isDark", val);
 			} else {
-				document.body.classList.remove("dark");
+				document.documentElement.classList.remove("dark");
 				localStorage.setItem("isDark", val);
 			}
 		});

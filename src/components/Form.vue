@@ -6,14 +6,15 @@
 				data-lpignore="true"
 				:placeholder="placeholder"
 				class="w-full focus:shadow-red-500 dark:bg-zinc-800 dark:border-zinc-700"
-				v-model="message"
+				:value="query"
+				@input="$emit('update:query', $event.target.value)"
 			/>
 			<span
 				class="absolute top-0 right-0 mt-3 mr-3 text-gray-400 hover:text-gray-600 cursor-pointer"
-				@click.prevent="message = ''"
+				@click.prevent="$emit('update:query', '')"
 			>
 				<svg
-					v-if="message"
+					v-if="query"
 					xmlns="http://www.w3.org/2000/svg"
 					class="h-5 w-5"
 					viewBox="0 0 20 20"
@@ -33,14 +34,16 @@
 					type="number"
 					class="w-full dark:bg-zinc-800 dark:border-zinc-700"
 					placeholder="Tweets (5 to 100)"
-					v-model="num_of_results"
+					:value="items"
+					@input="$emit('update:items', $event.target.value)"
 				/>
 			</div>
 			<div class="relative mr-2">
 				<label class="absolute top-0 -mt-5 text-2xs">Retweets</label>
 				<input
 					type="checkbox"
-					v-model="include.retweets"
+					:checked="retweets"
+					@input="$emit('update:retweets', $event.target.checked)"
 					class="text-red-500 w-10 h-10 dark:bg-zinc-800 dark:border-zinc-700"
 				/>
 			</div>
@@ -48,7 +51,8 @@
 				<label class="absolute top-0 -mt-5 text-2xs">Replies</label>
 				<input
 					type="checkbox"
-					v-model="include.replies"
+					:checked="replies"
+					@change="$emit('update:replies', $event.target.checked)"
 					class="text-red-500 w-10 h-10 dark:bg-zinc-800 dark:border-zinc-700"
 				/>
 			</div>
@@ -76,23 +80,30 @@
 	</form>
 </template>
 <script>
-import { computed } from "vue";
 export default {
 	props: {
-		modelValue: String,
-		num_of_results: Number,
-		include: Object,
-		placeholder: String,
-	},
-	setup(props, { emit }) {
-		const message = computed({
-			get: () => props.modelValue,
-			set: (value) => emit("update:modelValue", value),
-		});
-
-		return {
-			message,
-		};
+		query: {
+			type: String,
+			default: "",
+			required: true,
+		},
+		items: {
+			type: Number,
+			default: 100,
+			required: true,
+		},
+		retweets: {
+			type: Boolean,
+			default: false,
+		},
+		replies: {
+			type: Boolean,
+			default: true,
+		},
+		placeholder: {
+			type: String,
+			default: "Twitter Username",
+		},
 	},
 };
 </script>

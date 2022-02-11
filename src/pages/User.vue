@@ -1,9 +1,9 @@
 <template>
 	<Form
-		v-model="user"
-		:num_of_results="num_of_results"
-		:include="include"
-		placeholder="Twitter Username"
+		v-model:query="form.query"
+		v-model:items.number="form.items"
+		v-model:retweets="form.retweets"
+		v-model:replies="form.replies"
 		@search="getUser()"
 	/>
 
@@ -24,7 +24,7 @@
 	<TabsContent
 		:photos="photos"
 		:videos="videos"
-		:user="user"
+		:user="form.query"
 		:result_count="result_count"
 	/>
 
@@ -81,9 +81,13 @@ export default {
 	setup() {
 		const router = useRouter();
 		const route = useRoute();
-		const num_of_results = ref(100);
-		const include = ref({ retweets: false, replies: true });
-		const user = ref(route.query.u);
+		const form = ref({
+			query: route.query.u,
+			items: 100,
+			retweets: false,
+			replies: true,
+		});
+		// const user = ref(route.query.u);
 		const user_history = ref([]);
 		const message = ref(null);
 		const loading = ref(false);
@@ -106,8 +110,8 @@ export default {
 				user_history.value = history;
 			}
 
-			if (user.value) {
-				localData(user.value, "user", getMedia);
+			if (form.value.query) {
+				localData(form.value.query, "user", getMedia);
 			}
 		});
 
@@ -116,17 +120,17 @@ export default {
 				name: "user",
 				query: { u: val },
 			});
-			user.value = val;
-			localData(user.value, "user", getMedia);
+			form.value.query = val;
+			localData(form.value.query, "user", getMedia);
 		};
 
 		const getUser = async () => {
 			router.push({
 				name: "user",
-				query: { u: user.value },
+				query: { u: form.value.query },
 			});
 			// await getMedia();
-			localData(user.value, "user", getMedia);
+			localData(form.value.query, "user", getMedia);
 		};
 
 		const { userInfo, error, loadUserID } = getUserInfo();
@@ -135,9 +139,8 @@ export default {
 			cache.value = false;
 			loading.value = true;
 
-			// Display error if number of tweets are less than 5.
-			// Twitter API minimum search limit = 5
-			if (num_of_results.value < 5 || num_of_results.value > 100) {
+			// Display error if number of tweets are less than 5 or bigger than 100. Twitter limit
+			if (form.value.items < 5 || form.value.items > 100) {
 				message.value =
 					"Number of results value can not be less than 5 or higher than 100";
 				loading.value = false;
@@ -145,7 +148,7 @@ export default {
 			}
 
 			// Display error if user field is empty
-			if (!user.value) {
+			if (!form.value.query) {
 				message.value = "Please set a username";
 				loading.value = false;
 				return;
@@ -159,7 +162,7 @@ export default {
 				videos.value = [];
 				userDetails.value = {};
 				result_count.value = 0;
-				await loadUserID(user.value);
+				await loadUserID(form.value.query);
 			}
 
 			// Display error if user is not found
@@ -170,8 +173,11 @@ export default {
 			}
 
 			// Check user doesn't exists in search history. If true saves user value to localStorage
-			if (user_history.value && !user_history.value.includes(user.value)) {
-				user_history.value.push(user.value);
+			if (
+				user_history.value &&
+				!user_history.value.includes(form.value.query)
+			) {
+				user_history.value.push(form.value.query);
 				localStorage.setItem(
 					"user_history",
 					JSON.stringify(user_history.value)
@@ -183,16 +189,16 @@ export default {
 
 			// Exclude replies and retweets from search
 			let exclude = "exclude=retweets,replies&";
-			if (include.value.retweets && include.value.replies) {
+			if (form.value.retweets && form.value.replies) {
 				exclude = "";
-			} else if (include.value.retweets) {
+			} else if (form.value.retweets) {
 				exclude = "exclude=replies&";
-			} else if (include.value.replies) {
+			} else if (form.value.replies) {
 				exclude = "exclude=retweets&";
 			}
 
 			// Search Query parameters
-			let params = `${exclude}max_results=${num_of_results.value}&tweet.fields=id,created_at,text,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
+			let params = `${exclude}max_results=${form.value.items}&tweet.fields=id,created_at,text,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
 
 			let search_params = params;
 
@@ -200,6 +206,8 @@ export default {
 			if (token) {
 				search_params = `${params}&pagination_token=${token}`;
 			}
+
+			console.log(search_params);
 
 			// Make API call to return user tweets via user id
 			await api
@@ -226,7 +234,7 @@ export default {
 						result_count.value += res.data.meta.result_count;
 						next_token.value = res.data.meta.next_token;
 					} else {
-						result_count.value = num_of_results.value;
+						result_count.value = form.value.items;
 					}
 
 					// Set tweets text and media
@@ -234,10 +242,12 @@ export default {
 					let media = res.data.includes.media;
 
 					// Get tweets with photo and tweet text
-					let photoTweets = TweetsWithPhotos(tweets, media);
-					photoTweets.forEach((tweet) => {
-						photos.value.push(tweet);
-					});
+					photos.value = TweetsWithPhotos(tweets, media);
+					// let photoTweets = TweetsWithPhotos(tweets, media);
+					// console.log(photoTweets);
+					// photoTweets.forEach((tweet) => {
+					// 	photos.value.push(tweet);
+					// });
 
 					// Get tweet id's which contains video and animated gif's
 					let videoTweets = TweetsWithVideo(tweets, media);
@@ -273,7 +283,7 @@ export default {
 								userData.photos = photos.value;
 								userData.videos = videos.value;
 								localStorage.setItem(
-									"u_" + user.value,
+									"u_" + form.value.query,
 									JSON.stringify(userData)
 								);
 							}
@@ -287,7 +297,10 @@ export default {
 						userData.user = userDetails.value;
 						userData.photos = photos.value;
 						userData.videos = videos.value;
-						localStorage.setItem("u_" + user.value, JSON.stringify(userData));
+						localStorage.setItem(
+							"u_" + form.value.query,
+							JSON.stringify(userData)
+						);
 					}
 
 					// Set loading to false.
@@ -300,12 +313,10 @@ export default {
 		};
 
 		return {
-			user,
 			userDetails,
-			num_of_results,
+			form,
 			photos,
 			videos,
-			include,
 			loading,
 			next_token,
 			result_count,

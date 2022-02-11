@@ -1,9 +1,9 @@
 <template>
 	<Form
-		v-model="query"
-		:num_of_results="num_of_results"
-		:include="include"
-		placeholder="#hashtag / #multiple #hashtags / simple keyword"
+		v-model:query="form.query"
+		v-model:items.number="form.items"
+		v-model:retweets="form.retweets"
+		v-model:replies="form.replies"
 		@search="getQuery()"
 	/>
 
@@ -22,7 +22,7 @@
 	<TabsContent
 		:photos="photos"
 		:videos="videos"
-		:user="query"
+		:user="form.query"
 		:result_count="result_count"
 	/>
 
@@ -36,7 +36,7 @@
 	</div>
 
 	<div
-		class="mt-5 w-full text-red-500 border-4 border-red-500 text-center p-2 font-bold text-lg"
+		class="my-5 w-full text-red-500 border-4 border-red-500 text-center p-2 font-bold text-lg"
 		v-if="photos.length || videos.length"
 	>
 		<span v-if="photos.length">{{ photos.length }} photos</span>
@@ -78,9 +78,12 @@ export default {
 	setup() {
 		const router = useRouter();
 		const route = useRoute();
-		const query = ref(route.query.q);
-		const num_of_results = ref(100);
-		const include = ref({ retweets: false, replies: true });
+		const form = ref({
+			query: route.query.q,
+			items: 100,
+			retweets: false,
+			replies: true,
+		});
 		const message = ref(null);
 		const loading = ref(false);
 		const hashtag_history = ref([]);
@@ -102,8 +105,8 @@ export default {
 				hashtag_history.value = history;
 			}
 
-			if (query.value) {
-				localData(query.value, "search", getMedia);
+			if (form.value.query) {
+				localData(form.value.query, "search", getMedia);
 			}
 		});
 
@@ -112,32 +115,32 @@ export default {
 				name: "search",
 				query: { q: val },
 			});
-			query.value = val;
-			localData(query.value, "search", getMedia);
+			form.value.query = val;
+			localData(form.value.query, "search", getMedia);
 		};
 
 		const getQuery = async () => {
 			router.push({
 				name: "search",
-				query: { q: query.value },
+				query: { q: form.value.query },
 			});
 			// await getMedia();
-			localData(query.value, "search", getMedia);
+			localData(form.value.query, "search", getMedia);
 		};
 
 		const getMedia = async (token) => {
 			cache.value = false;
 			loading.value = true;
 
-			// Display error if number of tweets are less than 5.
-			// Twitter API minimum search limit = 5
-			if (num_of_results.value < 5) {
-				message.value = "Minimum results for tweets can not be less than 5";
+			// Display error if number of tweets are less than 5 or bigger than 100. Twitter limit
+			if (form.value.items < 5 || form.value.items > 100) {
+				message.value =
+					"Number of results value can not be less than 5 or higher than 100";
 				loading.value = false;
 				return;
 			}
 
-			if (!query.value) {
+			if (!form.value.query) {
 				message.value = "Please set a query";
 				loading.value = false;
 				return;
@@ -152,30 +155,30 @@ export default {
 
 			if (
 				hashtag_history.value &&
-				!hashtag_history.value.includes(query.value)
+				!hashtag_history.value.includes(form.value.query)
 			) {
-				hashtag_history.value.push(query.value);
+				hashtag_history.value.push(form.value.query);
 				localStorage.setItem(
 					"hashtag_history",
 					JSON.stringify(hashtag_history.value)
 				);
 			}
 
-			let q = query.value;
+			let q = form.value.query;
 			q = q.replace(/#/g, "%23");
 			q = q.replace(" ", "+");
 
 			let exclude = " -is:retweet -is:reply";
-			if (include.value.retweets && include.value.replies) {
+			if (form.value.retweets && form.value.replies) {
 				exclude = "";
-			} else if (include.value.retweets) {
+			} else if (form.value.retweets) {
 				exclude = " -is:reply";
-			} else if (include.value.replies) {
+			} else if (form.value.replies) {
 				exclude = " -is:retweet";
 			}
 
 			let params = `query=${q + exclude}&max_results=${
-				num_of_results.value
+				form.value.items
 			}&tweet.fields=created_at,author_id&expansions=attachments.media_keys,author_id&media.fields=media_key,preview_image_url,url`;
 
 			let search_params = params;
@@ -207,7 +210,7 @@ export default {
 						result_count.value += res.data.meta.result_count;
 						next_token.value = res.data.meta.next_token;
 					} else {
-						result_count.value = num_of_results.value;
+						result_count.value = form.value.items;
 					}
 
 					let tweets = [];
@@ -255,7 +258,7 @@ export default {
 								search.photos = photos.value;
 								search.videos = videos.value;
 								localStorage.setItem(
-									"q_" + query.value,
+									"q_" + form.value.query,
 									JSON.stringify(search)
 								);
 							}
@@ -265,7 +268,10 @@ export default {
 						search.tweets_count = result_count.value;
 						search.photos = photos.value;
 						search.videos = videos.value;
-						localStorage.setItem("q_" + query.value, JSON.stringify(search));
+						localStorage.setItem(
+							"q_" + form.value.query,
+							JSON.stringify(search)
+						);
 					}
 
 					loading.value = false;
@@ -277,9 +283,7 @@ export default {
 		};
 
 		return {
-			query,
-			num_of_results,
-			include,
+			form,
 			photos,
 			videos,
 			loading,
