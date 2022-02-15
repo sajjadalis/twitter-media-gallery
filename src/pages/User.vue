@@ -198,7 +198,7 @@ export default {
 			}
 
 			// Search Query parameters
-			let params = `${exclude}max_results=${form.value.items}&tweet.fields=id,created_at,text,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
+			let params = `${exclude}max_results=${form.value.items}&tweet.fields=id,created_at,text,public_metrics,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
 
 			let search_params = params;
 
@@ -206,8 +206,6 @@ export default {
 			if (token) {
 				search_params = `${params}&pagination_token=${token}`;
 			}
-
-			console.log(search_params);
 
 			// Make API call to return user tweets via user id
 			await api
@@ -240,14 +238,14 @@ export default {
 					// Set tweets text and media
 					let tweets = res.data.data;
 					let media = res.data.includes.media;
+					console.log(tweets);
 
 					// Get tweets with photo and tweet text
-					photos.value = TweetsWithPhotos(tweets, media);
-					// let photoTweets = TweetsWithPhotos(tweets, media);
-					// console.log(photoTweets);
-					// photoTweets.forEach((tweet) => {
-					// 	photos.value.push(tweet);
-					// });
+					let photoTweets = TweetsWithPhotos(tweets, media);
+					console.log(photoTweets);
+					photoTweets.forEach((tweet) => {
+						photos.value.push(tweet);
+					});
 
 					// Get tweet id's which contains video and animated gif's
 					let videoTweets = TweetsWithVideo(tweets, media);
@@ -270,6 +268,7 @@ export default {
 							video.id = tweet.id;
 							video.text = tweet.text;
 							video.created_at = tweet.created_at;
+							video.public_metrics = tweet.public_metrics;
 
 							// Push returned video with additional data to video array
 							videos.value.push(video);

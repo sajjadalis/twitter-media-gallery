@@ -179,7 +179,7 @@ export default {
 
 			let params = `query=${q + exclude}&max_results=${
 				form.value.items
-			}&tweet.fields=created_at,author_id&expansions=attachments.media_keys,author_id&media.fields=media_key,preview_image_url,url`;
+			}&tweet.fields=created_at,author_id,public_metrics&expansions=attachments.media_keys,author_id&media.fields=media_key,preview_image_url,url`;
 
 			let search_params = params;
 

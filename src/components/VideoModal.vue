@@ -4,30 +4,6 @@
 			class="overlay fixed top-0 left-0 bottom-0 right-0 z-10 bg-zinc-900 w-full h-screen bg-opacity-80"
 			@click="close"
 		>
-			<div v-if="showText == 'true'" class="fixed top-0 w-full z-40">
-				<div
-					class="bg-zinc-900 text-white text-sm text-center p-3 bg-opacity-70 mx-24"
-				>
-					<a
-						v-if="video.username"
-						:href="'https://twitter.com/' + video.username"
-						target="_blank"
-						class="hover:text-yellow-400 font-bold"
-						>@{{ video.username }}:</a
-					>
-					{{ video.text }}
-					<span class="text-yellow-300 ml-2"
-						>({{ date(video.created_at) }})</span
-					>
-					<a
-						:href="'https://twitter.com/user/status/' + video.id"
-						target="_blank"
-						class="inline-block bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 leading-none text-xs ml-2"
-						>View Tweet</a
-					>
-				</div>
-			</div>
-
 			<video
 				controls
 				loop
@@ -60,29 +36,7 @@
 			</button>
 
 			<button
-				:class="[showText == 'true' ? 'text-white' : 'text-gray-400']"
-				class="hover:text-white absolute top-0 right-0 mt-14 mr-4 z-50"
-				@click.prevent="text"
-				v-tippy="'Toggle Tweet Text'"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-8 w-8"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-					/>
-				</svg>
-			</button>
-
-			<button
-				class="hover:text-white absolute top-0 right-0 mt-24 mr-4 z-50"
+				class="hover:text-white absolute top-0 right-0 mt-16 mr-4 z-50"
 				@click="like"
 				v-tippy="'Like'"
 			>
@@ -159,30 +113,15 @@ import moment from "moment";
 export default {
 	props: ["video"],
 	setup(props, context) {
-		const showText = ref(null);
 		const videoLikes = ref([]);
 		const liked = ref(false);
 
 		onMounted(() => {
-			let showTweetText = localStorage.getItem("show_text");
-			if (showTweetText) {
-				showText.value = showTweetText;
-			}
-
 			let videos = JSON.parse(localStorage.getItem("video_likes"));
 			if (videos) {
 				videoLikes.value = videos;
 			}
 		});
-
-		const text = () => {
-			if (showText.value == "true") {
-				showText.value = "false";
-			} else {
-				showText.value = "true";
-			}
-			localStorage.setItem("show_text", showText.value);
-		};
 
 		const close = (e) => {
 			let classes = e.path[0].className;
@@ -200,7 +139,7 @@ export default {
 			liked.value = !liked.value;
 		};
 
-		return { showText, text, close, date, videoLikes, liked, like };
+		return { close, date, videoLikes, liked, like };
 	},
 };
 </script>

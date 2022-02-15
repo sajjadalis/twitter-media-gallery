@@ -29,38 +29,36 @@
 		<TabPanels class="mt-2">
 			<TabPanel>
 				<div v-if="photos.length" class="mt-5">
-					<masonry :cols="4" :gutter="10">
-						<div v-for="(img, i) in photos" :key="i" class="relative">
-							<button
-								v-if="img.url"
-								@click.prevent="likePhoto(img), $emit('like', img)"
-								class="absolute bottom-2 right-2"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="h-5 w-5 hover:transition-all"
-									:class="[
-										photoLikes.some((e) => e.media_key === img.media_key)
-											? 'fill-red-500 text-red-500 hover:text-red-500'
-											: 'text-white hover:text-gray-300',
-									]"
+					<masonry :cols="{ default: 4, 1000: 3, 768: 2, 576: 1 }" :gutter="10">
+						<div
+							v-for="(img, i) in photos"
+							:key="i"
+							class="relative bg-zinc-100 dark:bg-zinc-800 mb-3"
+						>
+							<div class="relative">
+								<a href="#" @click.prevent="mediaShow(img, i)"
+									><img
+										:src="img.url + '?format=jpg&name=small'"
+										class="mx-auto"
+									/>
+								</a>
+								<button
+									v-if="img.url"
+									@click.prevent="likePhoto(img), $emit('like', img)"
+									class="absolute bottom-2 right-2"
 								>
-									<path
-										d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-									></path>
-								</svg>
-							</button>
-							<a href="#" @click.prevent="mediaShow(img, i)"
-								><img class="item" :src="img.url"
-							/></a>
+									<HeartIcon
+										class="h-5 w-5 hover:transition-all"
+										:class="[
+											photoLikes.some((e) => e.media_key === img.media_key)
+												? 'fill-red-500 text-red-500 hover:text-red-500'
+												: 'text-white hover:text-gray-300',
+										]"
+									/>
+								</button>
+							</div>
+
+							<TweetText v-if="showText == 'true'" :img="img" :user="user" />
 						</div>
 					</masonry>
 					<PhotoModal
@@ -84,53 +82,38 @@
 			</TabPanel>
 			<TabPanel>
 				<div v-if="videos.length" class="mt-5">
-					<masonry :cols="4" :gutter="8">
+					<masonry :cols="{ default: 4, 1000: 3, 768: 2, 576: 1 }" :gutter="10">
 						<div
 							v-for="(video, i) in videos"
 							:key="i"
-							class="relative block mb-2"
+							class="relative bg-zinc-100 dark:bg-zinc-800 mb-3"
 						>
-							<button
-								@click.prevent="likeVideo(video)"
-								class="absolute bottom-2 right-2"
+							<a
+								href="#"
+								@click.prevent="mediaShow(video, i)"
+								class="relative block"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="h-5 w-5 hover:transition-all"
-									:class="[
-										videoLikes.some((e) => e.image === video.image)
-											? 'fill-red-500 text-red-500 hover:text-red-500'
-											: 'text-white hover:text-gray-300',
-									]"
-								>
-									<path
-										d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-									></path>
-								</svg>
-							</button>
-							<a href="#" @click.prevent="mediaShow(video, i)" class="">
-								<img :src="video.image" />
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
+								<img :src="video.image + '?format=jpg&name=small'" />
+
+								<PlayIcon
 									class="absolute top-1/2 left-1/2 mx-auto h-12 w-12 -ml-6 -mt-6 opacity-40 text-white"
-									viewBox="0 0 20 20"
-									fill="currentColor"
+								/>
+
+								<button
+									@click.prevent="likeVideo(video)"
+									class="absolute bottom-2 right-2"
 								>
-									<path
-										fill-rule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-										clip-rule="evenodd"
+									<HeartIcon
+										class="h-5 w-5 hover:transition-all"
+										:class="[
+											videoLikes.some((e) => e.image === video.image)
+												? 'fill-red-500 text-red-500 hover:text-red-500'
+												: 'text-white hover:text-gray-300',
+										]"
 									/>
-								</svg>
+								</button>
 							</a>
+							<TweetText v-if="showText == 'true'" :img="video" :user="user" />
 						</div>
 					</masonry>
 					<VideoModal
@@ -154,13 +137,23 @@
 		</TabPanels>
 	</TabGroup>
 
+	<ToggleText
+		v-if="photos.length || videos.length"
+		@toggle="text"
+		:showText="showText"
+	/>
+
 	<ScrollToTop v-if="photos.length || videos.length" />
 </template>
 <script>
 import { onMounted, ref } from "vue";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
+import { HeartIcon } from "@heroicons/vue/outline";
+import { PlayIcon } from "@heroicons/vue/solid";
 import PhotoModal from "./PhotoModal.vue";
 import VideoModal from "./VideoModal.vue";
+import TweetText from "./TweetText.vue";
+import ToggleText from "./ToggleText.vue";
 import ScrollToTop from "./ScrollToTop.vue";
 export default {
 	props: ["photos", "videos", "user", "result_count"],
@@ -172,7 +165,11 @@ export default {
 		TabPanel,
 		PhotoModal,
 		VideoModal,
+		TweetText,
+		ToggleText,
 		ScrollToTop,
+		HeartIcon,
+		PlayIcon,
 	},
 	setup(props) {
 		const mediaIndex = ref(null);
@@ -180,6 +177,7 @@ export default {
 		const singleMedia = ref(null);
 		const photoLikes = ref([]);
 		const videoLikes = ref([]);
+		const showText = ref(null);
 
 		const mediaShow = (media, index) => {
 			mediaIndex.value = index;
@@ -246,6 +244,11 @@ export default {
 			if (videos) {
 				videoLikes.value = videos;
 			}
+
+			let showTweetText = localStorage.getItem("show_text");
+			if (showTweetText) {
+				showText.value = showTweetText;
+			}
 		});
 
 		const likePhoto = (photo) => {
@@ -310,6 +313,15 @@ export default {
 			}
 		};
 
+		const text = () => {
+			if (showText.value == "true") {
+				showText.value = "false";
+			} else {
+				showText.value = "true";
+			}
+			localStorage.setItem("show_text", showText.value);
+		};
+
 		return {
 			mediaShow,
 			nextMedia,
@@ -321,7 +333,9 @@ export default {
 			singleMedia,
 			photoLikes,
 			videoLikes,
+			showText,
 			like,
+			text,
 		};
 	},
 };

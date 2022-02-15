@@ -11,18 +11,9 @@
 				class="absolute top-0 right-0"
 				@click.prevent="removeHistory(i, keyword)"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 mr-1 -mt-2 text-slate-600 dark:text-gray-100 hover:text-red-600"
-					viewBox="0 0 20 20"
-					fill="currentColor"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-						clip-rule="evenodd"
-					/>
-				</svg>
+				<XCircleIcon
+					class="h-4 w-4 mr-1 -mt-2 text-slate-600 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-600"
+				/>
 			</button>
 		</span>
 		<button
@@ -30,27 +21,18 @@
 			@click.prevent="clearHistory"
 		>
 			<div class="flex items-center">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-4 w-4 mr-1"
-					viewBox="0 0 20 20"
-					fill="currentColor"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-						clip-rule="evenodd"
-					/>
-				</svg>
+				<TrashIcon class="h-4 w-4 mr-1" />
 				Clear All
 			</div>
 		</button>
 	</div>
 </template>
 <script>
+import { XCircleIcon, TrashIcon } from "@heroicons/vue/solid";
 export default {
 	props: ["history", "type"],
 	emits: ["media"],
+	components: { XCircleIcon, TrashIcon },
 	setup(props) {
 		const removeHistory = (i, keyword) => {
 			props.history.splice(i, 1);

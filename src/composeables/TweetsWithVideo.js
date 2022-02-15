@@ -1,5 +1,5 @@
 const TweetsWithVideo = (tweets, media) => {
-	let props = ["id", "text", "created_at", "username"];
+	let props = ["id", "text", "created_at", "username", "public_metrics"];
 	let result = tweets
 		.filter(function (o1) {
 			// filter out (!) items in media
