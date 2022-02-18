@@ -10,6 +10,7 @@
     "@headlessui/vue": "^1.4.3",
     "@heroicons/vue": "^1.0.5",
     "@tailwindcss/forms": "^0.4.0",
+    "@vueuse/core": "^7.6.2",
     "axios": "^0.24.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",

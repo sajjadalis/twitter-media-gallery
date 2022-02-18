@@ -4,16 +4,18 @@
 			class="overlay fixed top-0 left-0 bottom-0 right-0 z-10 bg-zinc-900 w-full h-screen bg-opacity-80"
 			@click="close"
 		>
-			<video
-				controls
-				loop
-				autoplay
-				preload
-				disablepictureinpicture
-				class="z-10 w-auto mx-auto h-screen"
-			>
-				<source :src="video.url" type="video/mp4" />
-			</video>
+			<div class="w-3/4 h-screen my-10 bg-white">
+				<video
+					controls
+					loop
+					autoplay
+					preload
+					disablepictureinpicture
+					class="z-10 w-auto mx-auto h-full"
+				>
+					<source :src="video.url" type="video/mp4" />
+				</video>
+			</div>
 
 			<button
 				class="text-gray-400 hover:text-white absolute top-0 right-0 mt-4 mr-4 z-50"

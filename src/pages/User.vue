@@ -238,7 +238,7 @@ export default {
 					// Set tweets text and media
 					let tweets = res.data.data;
 					let media = res.data.includes.media;
-					console.log(tweets);
+					// console.log(tweets);
 
 					// Get tweets with photo and tweet text
 					let photoTweets = TweetsWithPhotos(tweets, media);
