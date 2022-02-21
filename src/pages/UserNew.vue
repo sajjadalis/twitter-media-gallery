@@ -21,9 +21,12 @@
 
 	<UserCard v-if="Object.keys(userDetails).length !== 0" :user="userDetails" />
 
-	<router-view></router-view>
-
-	<Media :media="media" :user="form.query" />
+	<TabsContent
+		:photos="photos"
+		:videos="videos"
+		:user="form.query"
+		:result_count="result_count"
+	/>
 
 	<div v-if="loading" class="spinner my-10 mx-auto"></div>
 
@@ -51,268 +54,279 @@
 		Load More
 	</button>
 </template>
-<script setup>
+<script>
 import { useRoute, useRouter } from "vue-router";
 import { onMounted, reactive, ref } from "vue";
 
 import Form from "../components/Form.vue";
 import SearchHistory from "../components/SearchHistory.vue";
 import UserCard from "../components/UserCard.vue";
-import Media from "../components/Media.vue";
+import TabsContent from "../components/TabsContent.vue";
 import CacheNotification from "../components/CacheNotification.vue";
 
 import api from "../composeables/api";
 import getUserInfo from "../composeables/getUserInfo";
 import TweetsWithVideo from "../composeables/TweetsWithVideo";
 import TweetsWithPhotos from "../composeables/TweetsWithPhotos";
-import TweetsWithMedia from "../composeables/TweetsWithMedia";
 import getVideo from "../composeables/getVideo";
 import getData from "../composeables/getData";
-
-import { useStorage } from "@vueuse/core";
-
-const router = useRouter();
-const route = useRoute();
-const form = ref({
-	query: route.query.u,
-	items: 100,
-	retweets: false,
-	replies: true,
-});
-// const user = ref(route.query.u);
-const user_history = ref([]);
-const message = ref(null);
-const loading = ref(false);
-
-const media = ref([]);
-
-const {
-	localData,
-	cache,
-	cached_on,
-	next_token,
-	photos,
-	videos,
-	userDetails,
-	result_count,
-} = getData();
-
-onMounted(() => {
-	let history = JSON.parse(localStorage.getItem("user_history"));
-	let users = JSON.parse(localStorage.getItem("users"));
-	console.log(users);
-
-	if (history) {
-		user_history.value = history;
-	}
-
-	if (form.value.query) {
-		localData(form.value.query, "user", getMedia);
-	}
-});
-
-const historyClick = async (val) => {
-	router.push({
-		name: "user",
-		query: { u: val },
-	});
-	form.value.query = val;
-	localData(form.value.query, "user", getMedia);
-};
-
-const getUser = async () => {
-	router.push({
-		name: "usernew",
-		query: { u: form.value.query },
-	});
-	// await getMedia();
-	localData(form.value.query, "user", getMedia);
-};
-
-const { userInfo, error, loadUserID } = getUserInfo();
-
-const getMedia = async (token) => {
-	cache.value = false;
-	loading.value = true;
-
-	// Display error if number of tweets are less than 5 or bigger than 100. Twitter limit
-	if (form.value.items < 5 || form.value.items > 100) {
-		message.value =
-			"Number of results value can not be less than 5 or higher than 100";
-		loading.value = false;
-		return;
-	}
-
-	// Display error if user field is empty
-	if (!form.value.query) {
-		message.value = "Please set a username";
-		loading.value = false;
-		return;
-	}
-
-	// Make sures that next_token doesn't exist and it's not a pagination call
-	// Returns UserId and other userInfo
-	if (!token) {
-		message.value = "";
-		photos.value = [];
-		videos.value = [];
-		userDetails.value = {};
-		result_count.value = 0;
-		await loadUserID(form.value.query);
-	}
-
-	// Display error if user is not found
-	if (!userInfo.value) {
-		loading.value = false;
-		message.value = "Error. User not found";
-		return;
-	}
-
-	// Check user doesn't exists in search history. If true saves user value to localStorage
-	if (user_history.value && !user_history.value.includes(form.value.query)) {
-		user_history.value.push(form.value.query);
-		localStorage.setItem("user_history", JSON.stringify(user_history.value));
-	}
-
-	// await and Set user data to display profile info
-	userDetails.value = await userInfo.value;
-
-	// Exclude replies and retweets from search
-	let exclude = "exclude=retweets,replies&";
-	if (form.value.retweets && form.value.replies) {
-		exclude = "";
-	} else if (form.value.retweets) {
-		exclude = "exclude=replies&";
-	} else if (form.value.replies) {
-		exclude = "exclude=retweets&";
-	}
-
-	// Search Query parameters
-	let params = `${exclude}max_results=${form.value.items}&tweet.fields=id,created_at,text,public_metrics,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
-
-	let search_params = params;
-
-	// If pagination next_token exists then and it to the query params to load more data
-	if (token) {
-		search_params = `${params}&pagination_token=${token}`;
-	}
-
-	// Make API call to return user tweets via user id
-	await api
-		.get(`2/users/${userDetails.value.id_str}/tweets?${search_params}`)
-		.then((res) => {
-			// console.log(res.data);
-
-			// Return if reponse contains errors with error details
-			if (res.data.errors) {
-				message.value = res.data.errors[0].detail;
-				loading.value = false;
-				return;
-			}
-
-			// Return if response object doesn't have include property, which contains media
-			if (!res.data.hasOwnProperty("includes")) {
-				result_count.value += res.data.meta.result_count;
-				next_token.value = res.data.meta.next_token;
-				message.value = `No photo found in ${result_count.value} tweets. Try to increase number of tweets`;
-				loading.value = false;
-				return;
-			}
-
-			// If reponse have meta property then set next_token and results count
-			if (res.data.hasOwnProperty("meta")) {
-				result_count.value += res.data.meta.result_count;
-				next_token.value = res.data.meta.next_token;
-			} else {
-				result_count.value = form.value.items;
-			}
-
-			// Set tweets text and media
-			let tweets = res.data.data;
-			let mediaData = res.data.includes.media;
-			// console.log(tweets);
-
-			media.value = TweetsWithMedia(tweets, mediaData);
-			// console.log(media.value);
-
-			const userData = reactive({});
-
-			if (media.value.length > 0) {
-				userData.cached_on = new Date();
-				userData.tweets_count = result_count.value;
-				userData.user = userDetails.value;
-				userData.media = media.value;
-				useStorage("u_" + userData.user, userData);
-			}
-
-			// // Get tweets with photo and tweet text
-			// let photoTweets = TweetsWithPhotos(tweets, media);
-			// // console.log(photoTweets);
-			// photoTweets.forEach((tweet) => {
-			// 	photos.value.push(tweet);
-			// });
-
-			// // Get tweet id's which contains video and animated gif's
-			// let videoTweets = TweetsWithVideo(tweets, media);
-
-			// // Reactive constant for userData to save it to localStorage for cache
-			// const userData = reactive({});
-
-			// // If videoTweets array exists then proceed with API calls
-			// if (videoTweets.length > 0) {
-			// 	// Set variable to find last iteration inside loop
-			// 	var videosProcessed = 0;
-
-			// 	// Make api request for each tweet via tweet id & get videos data
-			// 	// Add each video object to videos array
-			// 	videoTweets.forEach(async (tweet, index, array) => {
-			// 		// Make api call via tweet id to get Video Data
-			// 		let video = await getVideo(tweet.id);
-
-			// 		// Save additional data to video object
-			// 		video.id = tweet.id;
-			// 		video.text = tweet.text;
-			// 		video.created_at = tweet.created_at;
-			// 		video.public_metrics = tweet.public_metrics;
-
-			// 		// Push returned video with additional data to video array
-			// 		videos.value.push(video);
-
-			// 		// Save to localStorage on last iteration
-			// 		videosProcessed++;
-			// 		if (videosProcessed === array.length) {
-			// 			userData.cached_on = new Date();
-			// 			userData.tweets_count = result_count.value;
-			// 			userData.user = userDetails.value;
-			// 			userData.photos = photos.value;
-			// 			userData.videos = videos.value;
-			// 			localStorage.setItem(
-			// 				"u_" + form.value.query,
-			// 				JSON.stringify(userData)
-			// 			);
-			// 		}
-			// 	});
-			// }
-
-			// // If no videos found then proceed with saving only Photos data to localStorage
-			// else {
-			// 	userData.cached_on = new Date();
-			// 	userData.tweets_count = result_count.value;
-			// 	userData.user = userDetails.value;
-			// 	userData.photos = photos.value;
-			// 	userData.videos = videos.value;
-			// 	localStorage.setItem(
-			// 		"u_" + form.value.query,
-			// 		JSON.stringify(userData)
-			// 	);
-			// }
-
-			// Set loading to false.
-			loading.value = false;
-		})
-		.catch((err) => {
-			error.value = err.message;
-			console.log(error.value);
+export default {
+	components: {
+		Form,
+		SearchHistory,
+		UserCard,
+		TabsContent,
+		CacheNotification,
+	},
+	setup() {
+		const router = useRouter();
+		const route = useRoute();
+		const form = ref({
+			query: route.query.u,
+			items: 100,
+			retweets: false,
+			replies: true,
 		});
+		// const user = ref(route.query.u);
+		const user_history = ref([]);
+		const message = ref(null);
+		const loading = ref(false);
+
+		const {
+			localData,
+			cache,
+			cached_on,
+			next_token,
+			photos,
+			videos,
+			userDetails,
+			result_count,
+		} = getData();
+
+		onMounted(() => {
+			let history = JSON.parse(localStorage.getItem("user_history"));
+
+			if (history) {
+				user_history.value = history;
+			}
+
+			if (form.value.query) {
+				localData(form.value.query, "user", getMedia);
+			}
+		});
+
+		const historyClick = async (val) => {
+			router.push({
+				name: "user",
+				query: { u: val },
+			});
+			form.value.query = val;
+			localData(form.value.query, "user", getMedia);
+		};
+
+		const getUser = async () => {
+			router.push({
+				name: "user",
+				query: { u: form.value.query },
+			});
+			// await getMedia();
+			localData(form.value.query, "user", getMedia);
+		};
+
+		const { userInfo, error, loadUserID } = getUserInfo();
+
+		const getMedia = async (token) => {
+			cache.value = false;
+			loading.value = true;
+
+			// Display error if number of tweets are less than 5 or bigger than 100. Twitter limit
+			if (form.value.items < 5 || form.value.items > 100) {
+				message.value =
+					"Number of results value can not be less than 5 or higher than 100";
+				loading.value = false;
+				return;
+			}
+
+			// Display error if user field is empty
+			if (!form.value.query) {
+				message.value = "Please set a username";
+				loading.value = false;
+				return;
+			}
+
+			// Make sures that next_token doesn't exist and it's not a pagination call
+			// Returns UserId and other userInfo
+			if (!token) {
+				message.value = "";
+				photos.value = [];
+				videos.value = [];
+				userDetails.value = {};
+				result_count.value = 0;
+				await loadUserID(form.value.query);
+			}
+
+			// Display error if user is not found
+			if (!userInfo.value) {
+				loading.value = false;
+				message.value = "Error. User not found";
+				return;
+			}
+
+			// Check user doesn't exists in search history. If true saves user value to localStorage
+			if (
+				user_history.value &&
+				!user_history.value.includes(form.value.query)
+			) {
+				user_history.value.push(form.value.query);
+				localStorage.setItem(
+					"user_history",
+					JSON.stringify(user_history.value)
+				);
+			}
+
+			// await and Set user data to display profile info
+			userDetails.value = await userInfo.value;
+
+			// Exclude replies and retweets from search
+			let exclude = "exclude=retweets,replies&";
+			if (form.value.retweets && form.value.replies) {
+				exclude = "";
+			} else if (form.value.retweets) {
+				exclude = "exclude=replies&";
+			} else if (form.value.replies) {
+				exclude = "exclude=retweets&";
+			}
+
+			// Search Query parameters
+			let params = `${exclude}max_results=${form.value.items}&tweet.fields=id,created_at,text,public_metrics,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
+
+			let search_params = params;
+
+			// If pagination next_token exists then and it to the query params to load more data
+			if (token) {
+				search_params = `${params}&pagination_token=${token}`;
+			}
+
+			// Make API call to return user tweets via user id
+			await api
+				.get(`2/users/${userDetails.value.id_str}/tweets?${search_params}`)
+				.then((res) => {
+					// Return if reponse contains errors with error details
+					if (res.data.errors) {
+						message.value = res.data.errors[0].detail;
+						loading.value = false;
+						return;
+					}
+
+					// Return if response object doesn't have include property, which contains media
+					if (!res.data.hasOwnProperty("includes")) {
+						result_count.value += res.data.meta.result_count;
+						next_token.value = res.data.meta.next_token;
+						message.value = `No photo found in ${result_count.value} tweets. Try to increase number of tweets`;
+						loading.value = false;
+						return;
+					}
+
+					// If reponse have meta property then set next_token and results count
+					if (res.data.hasOwnProperty("meta")) {
+						result_count.value += res.data.meta.result_count;
+						next_token.value = res.data.meta.next_token;
+					} else {
+						result_count.value = form.value.items;
+					}
+
+					// Set tweets text and media
+					let tweets = res.data.data;
+					let media = res.data.includes.media;
+					// console.log(tweets);
+
+					// Get tweets with photo and tweet text
+					let photoTweets = TweetsWithPhotos(tweets, media);
+					console.log(photoTweets);
+					photoTweets.forEach((tweet) => {
+						photos.value.push(tweet);
+					});
+
+					// Get tweet id's which contains video and animated gif's
+					let videoTweets = TweetsWithVideo(tweets, media);
+
+					// Reactive constant for userData to save it to localStorage for cache
+					const userData = reactive({});
+
+					// If videoTweets array exists then proceed with API calls
+					if (videoTweets.length > 0) {
+						// Set variable to find last iteration inside loop
+						var videosProcessed = 0;
+
+						// Make api request for each tweet via tweet id & get videos data
+						// Add each video object to videos array
+						videoTweets.forEach(async (tweet, index, array) => {
+							// Make api call via tweet id to get Video Data
+							let video = await getVideo(tweet.id);
+
+							// Save additional data to video object
+							video.id = tweet.id;
+							video.text = tweet.text;
+							video.created_at = tweet.created_at;
+							video.public_metrics = tweet.public_metrics;
+
+							// Push returned video with additional data to video array
+							videos.value.push(video);
+
+							// Save to localStorage on last iteration
+							videosProcessed++;
+							if (videosProcessed === array.length) {
+								userData.cached_on = new Date();
+								userData.tweets_count = result_count.value;
+								userData.user = userDetails.value;
+								userData.photos = photos.value;
+								userData.videos = videos.value;
+								localStorage.setItem(
+									"u_" + form.value.query,
+									JSON.stringify(userData)
+								);
+							}
+						});
+					}
+
+					// If no videos found then proceed with saving only Photos data to localStorage
+					else {
+						userData.cached_on = new Date();
+						userData.tweets_count = result_count.value;
+						userData.user = userDetails.value;
+						userData.photos = photos.value;
+						userData.videos = videos.value;
+						localStorage.setItem(
+							"u_" + form.value.query,
+							JSON.stringify(userData)
+						);
+					}
+
+					// Set loading to false.
+					loading.value = false;
+				})
+				.catch((err) => {
+					error.value = err.message;
+					console.log(error.value);
+				});
+		};
+
+		return {
+			userDetails,
+			form,
+			photos,
+			videos,
+			loading,
+			next_token,
+			result_count,
+			message,
+			cache,
+			cached_on,
+			user_history,
+			historyClick,
+			getUser,
+			getMedia,
+		};
+	},
 };
 </script>

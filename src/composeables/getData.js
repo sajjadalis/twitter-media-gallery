@@ -4,8 +4,7 @@ import moment from "moment";
 const getData = () => {
 	const cached_on = ref(null);
 	const cache = ref(false);
-	const photos = ref([]);
-	const videos = ref([]);
+	const media = ref([]);
 	const userDetails = ref([]);
 	const next_token = ref(null);
 	const result_count = ref(0);
@@ -34,11 +33,8 @@ const getData = () => {
 			if (data.user) {
 				userDetails.value = data.user;
 			}
-			if (data.photos) {
-				photos.value = data.photos;
-			}
-			if (data.videos) {
-				videos.value = data.videos;
+			if (data.media) {
+				media.value = data.media;
 			}
 		} else {
 			await callback();
@@ -50,8 +46,7 @@ const getData = () => {
 		cache,
 		cached_on,
 		next_token,
-		photos,
-		videos,
+		media,
 		userDetails,
 		result_count,
 	};

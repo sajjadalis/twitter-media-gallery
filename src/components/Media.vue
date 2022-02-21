@@ -7,21 +7,28 @@
 				class="relative bg-zinc-100 dark:bg-zinc-800 mb-3"
 			>
 				<div class="relative">
-					<a
-						v-if="tweet.type == 'photo'"
-						href="#"
-						@click.prevent="mediaShow(tweet, i)"
-						><img :src="tweet.url + '?format=jpg&name=small'" class="mx-auto" />
-					</a>
 					<router-link
-						v-if="tweet.type == 'video' || tweet.type == 'animated_gif'"
 						class="relative block"
-						:to="{ name: 'modal', params: { id: tweet.id } }"
+						:to="{
+							name: 'modal',
+							params: {
+								id: tweet.media_key,
+								data: JSON.stringify(tweet),
+								user: user,
+								index: i,
+							},
+						}"
 					>
 						<img
+							v-if="tweet.type == 'photo'"
+							:src="tweet.url + '?format=jpg&name=small'"
+							class="mx-auto" />
+						<img
+							v-else
 							:src="tweet.preview_image_url + '?format=jpg&name=small'"
 							class="mx-auto" />
 						<PlayIcon
+							v-if="tweet.type != 'photo'"
 							class="absolute top-1/2 left-1/2 mx-auto h-16 w-16 -ml-8 -mt-8 opacity-50 text-white"
 					/></router-link>
 
@@ -44,16 +51,6 @@
 				<TweetText v-if="showText == 'true'" :img="tweet" :user="user" />
 			</div>
 		</masonry>
-		<PhotoModal
-			v-if="showModal"
-			:img="singleMedia"
-			:user="user"
-			@close="showModal = false"
-			@next="nextMedia('photo')"
-			@prev="prevMedia('photo')"
-			@like="like($event, 'photo')"
-			:key="'next' + mediaIndex"
-		/>
 	</div>
 
 	<div

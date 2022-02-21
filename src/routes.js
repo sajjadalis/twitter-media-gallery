@@ -6,11 +6,10 @@ import Likes from "./pages/Likes.vue";
 import Modal from "./components/Modal.vue";
 
 const routes = [
-	{ path: "/", component: User, name: "user" },
 	{
-		path: "/user",
-		component: UserNew,
-		name: "usernew",
+		path: "/",
+		component: User,
+		name: "user",
 		children: [
 			{
 				path: "p/:id",
@@ -18,6 +17,11 @@ const routes = [
 				name: "modal",
 			},
 		],
+	},
+	{
+		path: "/user",
+		component: UserNew,
+		name: "usernew",
 	},
 	// { path: "/:user", component: User },
 	{ path: "/search", component: Search, name: "search" },

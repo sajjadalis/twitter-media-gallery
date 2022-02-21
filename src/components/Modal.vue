@@ -1,54 +1,71 @@
 <template>
-	<transition
-		enter-active-class="duration-150 ease-out"
-		enter-from-class="opacity-0 scale-95"
-		enter-to-class="opacity-100 scale-100"
-		leave-active-class="duration-100 ease-in"
-		leave-from-class="opacity-100 scale-100"
-		leave-to-class="opacity-0 scale-95"
+	<div
+		class="overlay fixed top-0 left-0 bottom-0 right-0 z-10 bg-zinc-900 w-full h-full bg-opacity-80 py-7 text-center"
+		@click="close"
 	>
-		<div
-			class="overlay fixed top-0 left-0 bottom-0 right-0 z-10 bg-zinc-900 w-full h-full bg-opacity-80 py-7"
-			@click="close"
-		>
-			<div class="w-5/6 h-full mx-auto bg-black relative">
-				<video
-					v-if="video"
-					controls
-					loop
-					autoplay
-					preload
-					disablepictureinpicture
-					class="z-10 mx-auto w-full h-full"
-				>
-					<source :src="video.url" type="video/mp4" />
-				</video>
-
-				<div v-else class="animate-pulse w-full h-full bg-gray-200"></div>
-			</div>
-
-			<button
-				class="text-gray-400 hover:text-white absolute top-0 right-0 mt-4 mr-4 z-50"
-				@click="$router.back()"
-			>
-				<XIcon class="h-8 w-8" />
-			</button>
+		<div v-if="data.type == 'photo'" class="inline-block mx-auto -mt-7">
+			<img :src="data.url" :style="style" class="w-auto h-screen m-auto" />
+			<Toolbar
+				:img="data"
+				@rotleft="rotate('left')"
+				@rotright="rotate('right')"
+				@zoomin="zoom('in')"
+				@zoomout="zoom('out')"
+			/>
 		</div>
-	</transition>
+
+		<div v-else class="w-5/6 h-full mx-auto bg-black relative">
+			<video
+				v-if="video"
+				controls
+				loop
+				autoplay
+				preload
+				disablepictureinpicture
+				class="z-10 mx-auto w-full h-full"
+			>
+				<source :src="video.url" type="video/mp4" />
+			</video>
+
+			<div v-else class="animate-pulse w-full h-full bg-gray-200"></div>
+		</div>
+
+		<button
+			class="text-gray-400 hover:text-white absolute top-0 right-0 mt-4 mr-4 z-50"
+			@click="
+				router.push({
+					name: 'user',
+					query: { u: route.params.user },
+				})
+			"
+		>
+			<XIcon class="h-8 w-8" />
+		</button>
+
+		<button
+			class="text-gray-300 hover:text-white absolute top-2/4 right-0 -mt-8 mr-5"
+			@click="nav('next')"
+		>
+			<ChevronRightIcon class="h-8 w-8" />
+		</button>
+
+		<button
+			class="text-gray-300 hover:text-white absolute top-2/4 left-0 -mt-8 ml-5"
+			@click="nav('prev')"
+		>
+			<ChevronLeftIcon class="h-8 w-8" />
+		</button>
+	</div>
 </template>
 <script setup>
-import axios from "axios";
-import { onMounted, ref } from "vue";
+import { watchEffect, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import getVideo from "../composeables/getVideo";
+import Toolbar from "../components/Toolbar.vue";
 import {
-	ExternalLinkIcon,
-	ZoomInIcon,
-	ZoomOutIcon,
 	XIcon,
-	ChevronLeftIcon,
 	ChevronRightIcon,
-	HeartIcon,
+	ChevronLeftIcon,
 } from "@heroicons/vue/outline";
 
 // const props = defineProps({ post, user });
@@ -56,18 +73,70 @@ import {
 const router = useRouter();
 const route = useRoute();
 
-const id = ref(route.params.id);
+const data = ref(route.params.data);
 const video = ref(null);
 
+const emits = defineEmits(["next", "prev"]);
+
+const nav = (val) => {
+	if (val == "next") {
+		emits("next", route.params.index);
+	}
+
+	if (val == "prev") {
+		emits("prev", route.params.index);
+	}
+};
+
 onMounted(async () => {
-	video.value = await getVideo(id.value);
-	console.log(video.value);
+	// console.log(data.value);
+	if (data.value) {
+		data.value = JSON.parse(data.value);
+		if (data.value.type != "photo") {
+			video.value = await getVideo(data.value.id);
+		}
+	}
 });
 
 const close = (e) => {
 	let classes = e.path[0].className;
 	if (typeof classes == "string" && classes.includes("overlay")) {
-		router.back();
+		router.push({
+			name: "user",
+			query: { u: route.params.user },
+		});
 	}
+};
+
+const style = ref({});
+
+const zoom = (val) => {
+	if (val == "in") {
+		style.value = {
+			transform: "scale(1.5)",
+			transition: "transform 0.25s ease",
+		};
+	}
+	if (val == "out") {
+		style.value = {
+			transform: "scale(1)",
+			transition: "transform 0.25s ease",
+		};
+	}
+};
+
+const rot = ref(0);
+
+const rotate = (val) => {
+	if (val == "right") {
+		rot.value += 90;
+	} else if (val == "left") {
+		rot.value += -90;
+	}
+
+	style.value = {
+		transform: "rotate(" + rot.value + "deg)",
+		transition: "transform 0.25s ease",
+	};
 };
 </script>
