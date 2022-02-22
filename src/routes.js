@@ -1,6 +1,5 @@
 import { createWebHistory, createRouter } from "vue-router";
 import User from "./pages/User.vue";
-import UserNew from "./pages/UserNew.vue";
 import Search from "./pages/Search.vue";
 import Likes from "./pages/Likes.vue";
 import Modal from "./components/Modal.vue";
@@ -14,17 +13,22 @@ const routes = [
 			{
 				path: "p/:id",
 				component: Modal,
-				name: "modal",
+				name: "user_modal",
 			},
 		],
 	},
 	{
-		path: "/user",
-		component: UserNew,
-		name: "usernew",
+		path: "/search",
+		component: Search,
+		name: "search",
+		children: [
+			{
+				path: "p/:id",
+				component: Modal,
+				name: "search_modal",
+			},
+		],
 	},
-	// { path: "/:user", component: User },
-	{ path: "/search", component: Search, name: "search" },
 	{ path: "/likes", component: Likes },
 ];
 

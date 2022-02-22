@@ -10,11 +10,11 @@
 					<router-link
 						class="relative block"
 						:to="{
-							name: 'modal',
+							name: type,
 							params: {
 								id: tweet.media_key,
 								data: JSON.stringify(tweet),
-								user: user,
+								query: query,
 								index: i,
 							},
 						}"
@@ -33,7 +33,6 @@
 					/></router-link>
 
 					<button
-						v-if="tweet.url"
 						@click.prevent="likePhoto(tweet), $emit('like', tweet)"
 						class="absolute bottom-2 right-2"
 					>
@@ -48,7 +47,7 @@
 					</button>
 				</div>
 
-				<TweetText v-if="showText == 'true'" :img="tweet" :user="user" />
+				<TweetText v-if="showText == 'true'" :img="tweet" :query="query" />
 			</div>
 		</masonry>
 	</div>
@@ -76,7 +75,7 @@ import TweetText from "./TweetText.vue";
 import ToggleText from "./ToggleText.vue";
 import ScrollToTop from "./ScrollToTop.vue";
 export default {
-	props: ["media", "user", "result_count"],
+	props: ["media", "query", "result_count", "type"],
 	components: {
 		TabGroup,
 		TabList,
@@ -104,7 +103,7 @@ export default {
 
 		const open = (post) => {
 			router.push({
-				name: "modal", //use name for router push
+				name: props.type, //use name for router push
 				params: { data: JSON.stringify(post) },
 			});
 		};

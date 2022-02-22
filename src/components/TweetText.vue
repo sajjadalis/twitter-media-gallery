@@ -4,15 +4,15 @@
 
 		<div class="mt-2 flex items-center">
 			<a
-				:href="'/?u=' + (img.username ?? user)"
+				:href="'/?q=' + (img.username ?? query)"
 				target="_blank"
 				class="hover:text-gray-500 dark:hover:text-gray-100 flex flex-row items-center"
-				><UserIcon class="w-3 h-3 mr-1" /> {{ img.username ?? user }}</a
+				><UserIcon class="w-3 h-3 mr-1" /> {{ img.username ?? query }}</a
 			>
 
 			<a
 				:href="
-					'https://twitter.com/' + (img.username ?? user) + '/status/' + img.id
+					'https://twitter.com/' + (img.username ?? query) + '/status/' + img.id
 				"
 				class="hover:text-gray-500 dark:hover:text-gray-100 flex flex-row items-center ml-2"
 				target="_blank"
@@ -52,7 +52,7 @@ import {
 	ChatIcon,
 } from "@heroicons/vue/outline";
 export default {
-	props: ["img", "user"],
+	props: ["img", "query"],
 	components: { UserIcon, ClockIcon, HeartIcon, RefreshIcon, ChatIcon },
 	setup() {
 		const date = (date) => {

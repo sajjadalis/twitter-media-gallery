@@ -21,9 +21,14 @@
 
 	<UserCard v-if="Object.keys(userDetails).length !== 0" :user="userDetails" />
 
-	<router-view @next="next" @prev="prev" :key="$route.fullPath"></router-view>
+	<router-view
+		@next="next"
+		@prev="prev"
+		type="user"
+		:key="$route.fullPath"
+	></router-view>
 
-	<Media :media="media" :user="form.query" />
+	<Media :media="media" :query="form.query" type="user_modal" />
 
 	<div v-if="loading" class="spinner my-10 mx-auto"></div>
 
@@ -51,28 +56,23 @@
 </template>
 <script setup>
 import { useRoute, useRouter } from "vue-router";
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import Form from "../components/Form.vue";
 import SearchHistory from "../components/SearchHistory.vue";
 import UserCard from "../components/UserCard.vue";
 import Media from "../components/Media.vue";
 import CacheNotification from "../components/CacheNotification.vue";
-
-// import api from "../composeables/api";
-import getUserInfo from "../composeables/getUserInfo";
-// import TweetsWithMedia from "../composeables/TweetsWithMedia";
 import getData from "../composeables/getData";
 
 const router = useRouter();
 const route = useRoute();
 const form = ref({
-	query: route.query.u,
+	query: route.query.q,
 	items: 100,
 	retweets: false,
 	replies: true,
 });
-// const user = ref(route.query.u);
 const user_history = ref([]);
 
 const {
@@ -86,7 +86,6 @@ const {
 	media,
 	userDetails,
 	result_count,
-	error,
 	loading,
 	message,
 } = getData();
@@ -106,7 +105,7 @@ onMounted(() => {
 const historyClick = async (val) => {
 	router.push({
 		name: "user",
-		query: { u: val },
+		query: { q: val },
 	});
 	form.value.query = val;
 	localData(form.value.query, "user", getMedia);
@@ -115,7 +114,7 @@ const historyClick = async (val) => {
 const getUser = async () => {
 	router.push({
 		name: "user",
-		query: { u: form.value.query },
+		query: { q: form.value.query },
 	});
 	// await getMedia();
 	localData(form.value.query, "user", getMedia);
@@ -186,7 +185,7 @@ const getMedia = async (token) => {
 		search_params = `${params}&pagination_token=${token}`;
 	}
 
-	await apiCall(userDetails.value.id_str, search_params);
+	await apiCall(`2/users/${userDetails.value.id_str}/tweets?${search_params}`);
 
 	const userData = {
 		cached_on: new Date(),
@@ -203,7 +202,7 @@ const next = (val) => {
 	index += 1;
 	let tweet = media.value[index];
 	router.push({
-		name: "modal",
+		name: "user_modal",
 		params: {
 			id: tweet.media_key,
 			data: JSON.stringify(tweet),
@@ -219,7 +218,7 @@ const prev = (val) => {
 	index -= 1;
 	let tweet = media.value[index];
 	router.push({
-		name: "modal",
+		name: "user_modal",
 		params: {
 			id: tweet.media_key,
 			data: JSON.stringify(tweet),

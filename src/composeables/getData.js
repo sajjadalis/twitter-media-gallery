@@ -14,18 +14,6 @@ const getData = () => {
 	const message = ref(null);
 	const loading = ref(false);
 
-	const getUserID = async (user) => {
-		await api
-			.get(`1.1/users/show.json?screen_name=${user}`)
-			.then((res) => {
-				userDetails.value = res.data;
-			})
-			.catch((err) => {
-				error.value = err.message;
-				console.log(error.value);
-			});
-	};
-
 	const localData = async (query, type, callback) => {
 		let data;
 		if (type == "user") {
@@ -58,9 +46,24 @@ const getData = () => {
 		}
 	};
 
-	const apiCall = async (user_id, search_params) => {
+	const getUserID = async (user) => {
 		await api
-			.get(`2/users/${user_id}/tweets?${search_params}`)
+			.get(`1.1/users/show.json?screen_name=${user}`)
+			.then((res) => {
+				userDetails.value = res.data;
+			})
+			.catch((err) => {
+				if (err.message) {
+					message.value = err.message;
+					console.log(message.value);
+					loading.value = false;
+				}
+			});
+	};
+
+	const apiCall = async (query) => {
+		await api
+			.get(query)
 			.then((res) => {
 				// Return if reponse contains errors with error details
 				if (res.data.errors) {
@@ -86,10 +89,30 @@ const getData = () => {
 					result_count.value = form.value.items;
 				}
 
-				// Set tweets text and media
-				let tweets = res.data.data;
 				let mediaData = res.data.includes.media;
-				// console.log(tweets);
+				// console.log(res.data);
+
+				let tweets;
+				if (
+					res.data.hasOwnProperty("includes") &&
+					res.data.includes.hasOwnProperty("users")
+				) {
+					tweets = [];
+
+					let tempTweets = res.data.data;
+					let tempUsers = res.data.includes.users;
+
+					tempTweets.forEach((x) => {
+						tempUsers.forEach((y) => {
+							if (x.author_id === y.id) {
+								delete y.id;
+								tweets.push({ ...x, ...y });
+							}
+						});
+					});
+				} else {
+					tweets = res.data.data;
+				}
 
 				let mediaTweets = TweetsWithMedia(tweets, mediaData);
 				mediaTweets.forEach((tweet) => {
@@ -100,8 +123,8 @@ const getData = () => {
 				loading.value = false;
 			})
 			.catch((err) => {
-				error.value = err.message;
-				console.log(error.value);
+				message.value = err.message;
+				console.log(message.value);
 			});
 	};
 

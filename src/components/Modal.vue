@@ -35,8 +35,8 @@
 			class="text-gray-400 hover:text-white absolute top-0 right-0 mt-4 mr-4 z-50"
 			@click="
 				router.push({
-					name: 'user',
-					query: { u: route.params.user },
+					name: props.type,
+					query: { q: route.params.query },
 				})
 			"
 		>
@@ -78,6 +78,7 @@ const data = ref(route.params.data);
 const video = ref(null);
 
 const emits = defineEmits(["next", "prev"]);
+const props = defineProps(["type"]);
 
 const nav = (val) => {
 	if (val == "next") {
@@ -106,8 +107,8 @@ const close = (e) => {
 	let classes = e.path[0].className;
 	if (typeof classes == "string" && classes.includes("overlay")) {
 		router.push({
-			name: "user",
-			query: { u: route.params.user },
+			name: props.type,
+			query: { q: route.params.query },
 		});
 	}
 };
