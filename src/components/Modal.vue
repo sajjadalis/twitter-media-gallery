@@ -3,10 +3,11 @@
 		class="overlay fixed top-0 left-0 bottom-0 right-0 z-10 bg-zinc-900 w-full h-full bg-opacity-80 py-7 text-center"
 		@click="close"
 	>
-		<div v-if="data.type == 'photo'" class="inline-block mx-auto -mt-7">
+		<div v-if="data && data.type == 'photo'" class="inline-block mx-auto -mt-7">
 			<img :src="data.url" :style="style" class="w-auto h-screen m-auto" />
 			<Toolbar
 				:img="data"
+				:user="route.params.user"
 				@rotleft="rotate('left')"
 				@rotright="rotate('right')"
 				@zoomin="zoom('in')"
@@ -58,7 +59,7 @@
 	</div>
 </template>
 <script setup>
-import { watchEffect, ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import getVideo from "../composeables/getVideo";
 import Toolbar from "../components/Toolbar.vue";
@@ -89,12 +90,15 @@ const nav = (val) => {
 };
 
 onMounted(async () => {
-	// console.log(data.value);
 	if (data.value) {
 		data.value = JSON.parse(data.value);
 		if (data.value.type != "photo") {
 			video.value = await getVideo(data.value.id);
 		}
+	} else {
+		router.push({
+			name: "user",
+		});
 	}
 });
 

@@ -1,13 +1,30 @@
 import { ref } from "vue";
 import moment from "moment";
+import api from "./api";
+import TweetsWithMedia from "./TweetsWithMedia";
 
 const getData = () => {
 	const cached_on = ref(null);
 	const cache = ref(false);
 	const media = ref([]);
-	const userDetails = ref([]);
+	const userDetails = ref({});
 	const next_token = ref(null);
 	const result_count = ref(0);
+	const error = ref(null);
+	const message = ref(null);
+	const loading = ref(false);
+
+	const getUserID = async (user) => {
+		await api
+			.get(`1.1/users/show.json?screen_name=${user}`)
+			.then((res) => {
+				userDetails.value = res.data;
+			})
+			.catch((err) => {
+				error.value = err.message;
+				console.log(error.value);
+			});
+	};
 
 	const localData = async (query, type, callback) => {
 		let data;
@@ -41,14 +58,66 @@ const getData = () => {
 		}
 	};
 
+	const apiCall = async (user_id, search_params) => {
+		await api
+			.get(`2/users/${user_id}/tweets?${search_params}`)
+			.then((res) => {
+				// Return if reponse contains errors with error details
+				if (res.data.errors) {
+					message.value = res.data.errors[0].detail;
+					loading.value = false;
+					return;
+				}
+
+				// Return if response object doesn't have include property, which contains media
+				if (!res.data.hasOwnProperty("includes")) {
+					result_count.value += res.data.meta.result_count;
+					next_token.value = res.data.meta.next_token;
+					message.value = `No photo found in ${result_count.value} tweets. Try to increase number of tweets`;
+					loading.value = false;
+					return;
+				}
+
+				// If reponse have meta property then set next_token and results count
+				if (res.data.hasOwnProperty("meta")) {
+					result_count.value += res.data.meta.result_count;
+					next_token.value = res.data.meta.next_token;
+				} else {
+					result_count.value = form.value.items;
+				}
+
+				// Set tweets text and media
+				let tweets = res.data.data;
+				let mediaData = res.data.includes.media;
+				// console.log(tweets);
+
+				let mediaTweets = TweetsWithMedia(tweets, mediaData);
+				mediaTweets.forEach((tweet) => {
+					media.value.push(tweet);
+				});
+
+				// Set loading to false.
+				loading.value = false;
+			})
+			.catch((err) => {
+				error.value = err.message;
+				console.log(error.value);
+			});
+	};
+
 	return {
+		getUserID,
 		localData,
+		apiCall,
 		cache,
 		cached_on,
 		next_token,
 		media,
 		userDetails,
 		result_count,
+		error,
+		message,
+		loading,
 	};
 };
 

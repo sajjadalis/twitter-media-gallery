@@ -1,6 +1,6 @@
 <template>
-	<div class="font-sans leading-tight bg-grey-lighter mt-5">
-		<div class="mx-auto bg-white dark:bg-zinc-800 overflow-hidden">
+	<div class="font-sans leading-tight bg-grey-lighter mt-5 mb-10">
+		<div class="mx-auto bg-white dark:bg-zinc-900 overflow-hidden">
 			<div class="bg-cover bg-center bg-gray-200 dark:bg-zinc-700 h-80">
 				<a
 					v-if="user.profile_banner_url"
@@ -15,7 +15,7 @@
 						:href="user.profile_image_url_https.replace('_normal', '')"
 						target="_blank"
 						><img
-							class="h-32 w-32 rounded-full border-4 border-white -mt-16 mr-4"
+							class="h-32 w-32 rounded-full border-[7px] border-white dark:border-zinc-900 -mt-16 mr-4"
 							:src="user.profile_image_url_https.replace('_normal', '')"
 							alt=""
 					/></a>

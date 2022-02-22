@@ -102,7 +102,7 @@ import {
 	ZoomOutIcon,
 } from "@heroicons/vue/outline";
 
-const props = defineProps(["img"]);
+const props = defineProps(["img", "user"]);
 
 const save = (val) => {
 	return axios

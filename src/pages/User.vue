@@ -59,9 +59,9 @@ import UserCard from "../components/UserCard.vue";
 import Media from "../components/Media.vue";
 import CacheNotification from "../components/CacheNotification.vue";
 
-import api from "../composeables/api";
+// import api from "../composeables/api";
 import getUserInfo from "../composeables/getUserInfo";
-import TweetsWithMedia from "../composeables/TweetsWithMedia";
+// import TweetsWithMedia from "../composeables/TweetsWithMedia";
 import getData from "../composeables/getData";
 
 const router = useRouter();
@@ -74,22 +74,25 @@ const form = ref({
 });
 // const user = ref(route.query.u);
 const user_history = ref([]);
-const message = ref(null);
-const loading = ref(false);
 
 const {
+	getUserID,
 	localData,
+	apiCall,
+	userInfo,
 	cache,
 	cached_on,
 	next_token,
 	media,
 	userDetails,
 	result_count,
+	error,
+	loading,
+	message,
 } = getData();
 
 onMounted(() => {
 	let history = JSON.parse(localStorage.getItem("user_history"));
-	let users = JSON.parse(localStorage.getItem("users"));
 
 	if (history) {
 		user_history.value = history;
@@ -98,8 +101,6 @@ onMounted(() => {
 	if (form.value.query) {
 		localData(form.value.query, "user", getMedia);
 	}
-
-	console.log(route.fullPath);
 });
 
 const historyClick = async (val) => {
@@ -119,8 +120,6 @@ const getUser = async () => {
 	// await getMedia();
 	localData(form.value.query, "user", getMedia);
 };
-
-const { userInfo, error, loadUserID } = getUserInfo();
 
 const getMedia = async (token) => {
 	cache.value = false;
@@ -142,17 +141,17 @@ const getMedia = async (token) => {
 	}
 
 	// Make sures that next_token doesn't exist and it's not a pagination call
-	// Returns UserId and other userInfo
+	// Returns userId and userInfo
 	if (!token) {
 		message.value = "";
 		media.value = [];
 		userDetails.value = {};
 		result_count.value = 0;
-		await loadUserID(form.value.query);
+		await getUserID(form.value.query);
 	}
 
 	// Display error if user is not found
-	if (!userInfo.value) {
+	if (!userDetails.value) {
 		loading.value = false;
 		message.value = "Error. User not found";
 		return;
@@ -164,8 +163,8 @@ const getMedia = async (token) => {
 		localStorage.setItem("user_history", JSON.stringify(user_history.value));
 	}
 
-	// await and Set user data to display profile info
-	userDetails.value = await userInfo.value;
+	// Set user data to display profile info
+	// userDetails.value = userInfo.value;
 
 	// Exclude replies and retweets from search
 	let exclude = "exclude=retweets,replies&";
@@ -187,61 +186,16 @@ const getMedia = async (token) => {
 		search_params = `${params}&pagination_token=${token}`;
 	}
 
-	// Make API call to return user tweets via user id
-	await api
-		.get(`2/users/${userDetails.value.id_str}/tweets?${search_params}`)
-		.then((res) => {
-			// Return if reponse contains errors with error details
-			if (res.data.errors) {
-				message.value = res.data.errors[0].detail;
-				loading.value = false;
-				return;
-			}
+	await apiCall(userDetails.value.id_str, search_params);
 
-			// Return if response object doesn't have include property, which contains media
-			if (!res.data.hasOwnProperty("includes")) {
-				result_count.value += res.data.meta.result_count;
-				next_token.value = res.data.meta.next_token;
-				message.value = `No photo found in ${result_count.value} tweets. Try to increase number of tweets`;
-				loading.value = false;
-				return;
-			}
+	const userData = {
+		cached_on: new Date(),
+		tweets_count: result_count.value,
+		user: userDetails.value,
+		media: media.value,
+	};
 
-			// If reponse have meta property then set next_token and results count
-			if (res.data.hasOwnProperty("meta")) {
-				result_count.value += res.data.meta.result_count;
-				next_token.value = res.data.meta.next_token;
-			} else {
-				result_count.value = form.value.items;
-			}
-
-			// Set tweets text and media
-			let tweets = res.data.data;
-			let mediaData = res.data.includes.media;
-			// console.log(tweets);
-
-			let mediaTweets = TweetsWithMedia(tweets, mediaData);
-			mediaTweets.forEach((tweet) => {
-				media.value.push(tweet);
-			});
-
-			// Set loading to false.
-			loading.value = false;
-		})
-		.finally(() => {
-			const userData = {
-				cached_on: new Date(),
-				tweets_count: result_count.value,
-				user: userDetails.value,
-				media: media.value,
-			};
-
-			localStorage.setItem("u_" + form.value.query, JSON.stringify(userData));
-		})
-		.catch((err) => {
-			error.value = err.message;
-			console.log(error.value);
-		});
+	localStorage.setItem("u_" + form.value.query, JSON.stringify(userData));
 };
 
 const next = (val) => {
