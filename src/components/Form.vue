@@ -7,6 +7,8 @@
 				:placeholder="placeholder"
 				class="w-full focus:shadow-red-500 dark:bg-zinc-800 dark:border-zinc-700"
 				:value="query"
+				@focus="showHistory = true"
+				@blur="showHistory = false"
 				@input="$emit('update:query', $event.target.value)"
 			/>
 			<span
@@ -15,7 +17,43 @@
 			>
 				<XIcon v-if="query" class="h-5 w-5" />
 			</span>
+
+			<div
+				v-if="history.length > 0"
+				v-show="showHistory"
+				class="absolute top-11 leading-10 w-full max-h-96 overflow-y-auto scrollbar scrollbar-thumb-slate-300 scrollbar-track-slate-200 dark:scrollbar-thumb-zinc-700 dark:scrollbar-track-zinc-600 bg-slate-100 dark:bg-zinc-800"
+			>
+				<h3 class="pl-2 py-1 font-bold">Search History</h3>
+				<div class="relative" v-for="(keyword, i) in history" :key="i">
+					<span
+						class="border-t bg-slate-100 border-slate-200 hover:bg-slate-200 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-900 py-1 px-2 mr-2 cursor-pointer block"
+						@mousedown.prevent
+						@click.prevent="$emit('media', keyword)"
+						>{{ keyword }}
+					</span>
+					<button
+						class="absolute top-0 right-0"
+						@mousedown.prevent
+						@click.prevent="removeHistory(i, keyword)"
+					>
+						<XCircleIcon
+							class="h-4 w-4 mr-7 mt-4 text-slate-600 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-600"
+						/>
+					</button>
+				</div>
+				<button
+					class="border border-red-600 bg-red-500 hover:bg-red-600 text-white py-1 px-2 leading-snug w-full text-center"
+					@mousedown.prevent
+					@click.prevent="clearHistory"
+				>
+					<div class="flex items-center">
+						<TrashIcon class="h-4 w-4 mr-1" />
+						Clear All
+					</div>
+				</button>
+			</div>
 		</div>
+
 		<div class="flex mt-6 md:mt-0 md:mx-0">
 			<div class="mr-2 w-80 md:w-40">
 				<input
@@ -58,6 +96,7 @@
 </template>
 <script>
 import { XIcon, PhotographIcon } from "@heroicons/vue/outline";
+import { XCircleIcon, TrashIcon } from "@heroicons/vue/solid";
 export default {
 	props: {
 		query: {
@@ -82,10 +121,43 @@ export default {
 			type: String,
 			default: "Twitter Username",
 		},
+		type: {
+			type: String,
+		},
+		history: {
+			type: Array,
+		},
+		showHistory: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	components: {
 		XIcon,
 		PhotographIcon,
+		XCircleIcon,
+		TrashIcon,
+	},
+	setup(props) {
+		const removeHistory = (i, keyword) => {
+			props.history.splice(i, 1);
+			localStorage.setItem(props.type, JSON.stringify(props.history));
+			if (props.type == "user_history") {
+				localStorage.removeItem("u_" + keyword);
+			}
+
+			if (props.type == "search_history") {
+				localStorage.removeItem("q_" + keyword);
+			}
+		};
+
+		const clearHistory = () => {
+			let len = props.history.length;
+			localStorage.removeItem(props.type);
+			props.history.splice(0, len);
+		};
+
+		return { removeHistory, clearHistory };
 	},
 };
 </script>

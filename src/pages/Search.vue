@@ -4,13 +4,10 @@
 		v-model:items.number="form.items"
 		v-model:retweets="form.retweets"
 		v-model:replies="form.replies"
-		@search="getQuery()"
-	/>
-
-	<SearchHistory
 		:history="hashtag_history"
+		:showHistory="showHistory"
 		type="hashtag_history"
-		@media="historyClick"
+		@search="getQuery()"
 	/>
 
 	<CacheNotification
@@ -71,7 +68,9 @@ const form = ref({
 	retweets: false,
 	replies: true,
 });
+
 const hashtag_history = ref([]);
+const showHistory = ref(false);
 
 const {
 	getUserID,

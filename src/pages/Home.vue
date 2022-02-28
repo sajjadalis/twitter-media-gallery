@@ -7,15 +7,16 @@
 		@search="getUser()"
 	/>
 
-	<SearchHistory
+	<!-- <SearchHistory
 		:history="user_history"
 		type="user_history"
 		@media="historyClick"
-	/>
+	/> -->
 </template>
 <script setup>
 import Form from "../components/Form.vue";
 import SearchHistory from "../components/SearchHistory.vue";
+
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -28,23 +29,23 @@ const form = ref({
 	replies: true,
 });
 
-// const user = ref(route.query.u);
-const user_history = ref([]);
+// // const user = ref(route.query.u);
+// const user_history = ref([]);
 
-onMounted(() => {
-	let history = JSON.parse(localStorage.getItem("user_history"));
+// onMounted(() => {
+// 	let history = JSON.parse(localStorage.getItem("user_history"));
 
-	if (history) {
-		user_history.value = history;
-	}
-});
+// 	if (history) {
+// 		user_history.value = history;
+// 	}
+// });
 
-const historyClick = (val) => {
-	router.push({
-		name: "user",
-		params: { username: val },
-	});
-};
+// const historyClick = (val) => {
+// 	router.push({
+// 		name: "user",
+// 		params: { username: val },
+// 	});
+// };
 
 const getUser = async () => {
 	router.push({

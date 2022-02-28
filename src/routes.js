@@ -29,7 +29,18 @@ const routes = [
 			},
 		],
 	},
-	{ path: "/likes", component: Likes },
+	{
+		path: "/likes",
+		component: Likes,
+		name: "likes",
+		children: [
+			{
+				path: "p/:id",
+				component: Modal,
+				name: "likes_modal",
+			},
+		],
+	},
 ];
 
 const router = createRouter({

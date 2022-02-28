@@ -5,13 +5,19 @@
 		v-model:retweets="form.retweets"
 		v-model:replies="form.replies"
 		@search="getUser()"
-	/>
-
-	<SearchHistory
 		:history="user_history"
+		:showHistory="showHistory"
 		type="user_history"
 		@media="historyClick"
 	/>
+	<!-- <div class="relative">
+		<SearchHistory
+			v-show="showHistory"
+			:history="user_history"
+			type="user_history"
+			@media="historyClick"
+		/>
+	</div> -->
 
 	<CacheNotification
 		:cache="cache"
@@ -74,6 +80,7 @@ const form = ref({
 	replies: true,
 });
 const user_history = ref([]);
+const showHistory = ref(false);
 
 const {
 	getUserID,
@@ -109,6 +116,7 @@ const historyClick = async (val) => {
 	});
 	form.value.query = val;
 	localData(form.value.query, "user", getMedia);
+	showHistory.value = false;
 };
 
 const getUser = async () => {

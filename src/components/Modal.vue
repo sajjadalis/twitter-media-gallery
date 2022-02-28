@@ -106,10 +106,12 @@ onMounted(async () => {
 const close = (e) => {
 	let classes = e.path[0].className;
 	if (typeof classes == "string" && classes.includes("overlay")) {
-		router.push({
-			name: props.type,
-			query: { q: route.params.query },
-		});
+		let endpoint = { name: props.type };
+
+		if (route.params && route.params.query) {
+			endpoint.query = { q: route.params.query };
+		}
+		router.push(endpoint);
 	}
 };
 

@@ -1,7 +1,7 @@
 <template>
-	<div class="flex flex-row items-center space-x-1">
+	<!-- <div class="flex flex-row items-center space-x-1">
 		<button
-			v-if="photoLikes.length"
+			v-if="mediaLikes.length"
 			@click.prevent="clearPhotos"
 			class="w-full text-white bg-red-500 hover:bg-red-600 p-3 uppercase font-bold mb-5"
 		>
@@ -14,57 +14,76 @@
 		>
 			Clear All Videos
 		</button>
-	</div>
+	</div> -->
 
-	<div class="-mt-6">
-		<TabsContent :photos="photoLikes" :videos="videoLikes" />
-	</div>
+	<router-view
+		@next="next"
+		@prev="prev"
+		type="likes"
+		:key="$route.fullPath"
+	></router-view>
+
+	<Media :media="media" type="likes_modal" />
+
+	<div class="-mt-6"></div>
 </template>
 
-<script>
+<script setup>
 import { onMounted, ref } from "vue";
-import TabsContent from "../components/TabsContent.vue";
+import Media from "../components/Media.vue";
 
-export default {
-	components: {
-		TabsContent,
-	},
-	setup() {
-		const photoLikes = ref([]);
-		const videoLikes = ref([]);
+const media = ref([]);
 
-		onMounted(() => {
-			let photos = JSON.parse(localStorage.getItem("photo_likes"));
-			if (photos) {
-				photoLikes.value = photos;
-			}
+onMounted(() => {
+	let mediaLikes = JSON.parse(localStorage.getItem("media_likes"));
+	if (mediaLikes) {
+		media.value = mediaLikes;
+	}
+});
 
-			let videos = JSON.parse(localStorage.getItem("video_likes"));
-			if (videos) {
-				videoLikes.value = videos;
-			}
-		});
-
-		const clearPhotos = () => {
-			if (confirm("Are you sure? All photos will be cleared on likes page.")) {
-				localStorage.removeItem("photo_likes");
-				photoLikes.value = [];
-			}
-		};
-
-		const clearVideos = () => {
-			if (confirm("Are you sure? All videos will be cleared on likes page.")) {
-				localStorage.removeItem("video_likes");
-				videoLikes.value = [];
-			}
-		};
-
-		return {
-			photoLikes,
-			videoLikes,
-			clearPhotos,
-			clearVideos,
-		};
-	},
+const next = (val) => {
+	let index = Number(val);
+	index += 1;
+	let tweet = media.value[index];
+	router.push({
+		name: "user_modal",
+		params: {
+			id: tweet.media_key,
+			data: JSON.stringify(tweet),
+			user: form.value.query,
+			index: index,
+		},
+	});
+	// console.log(tweet);
 };
+
+const prev = (val) => {
+	let index = Number(val);
+	index -= 1;
+	let tweet = media.value[index];
+	router.push({
+		name: "user_modal",
+		params: {
+			id: tweet.media_key,
+			data: JSON.stringify(tweet),
+			user: form.value.query,
+			index: index,
+		},
+	});
+	// console.log(tweet);
+};
+
+// const clearPhotos = () => {
+// 	if (confirm("Are you sure? All photos will be cleared on likes page.")) {
+// 		localStorage.removeItem("photo_likes");
+// 		mediaLikes.value = [];
+// 	}
+// };
+
+// const clearVideos = () => {
+// 	if (confirm("Are you sure? All videos will be cleared on likes page.")) {
+// 		localStorage.removeItem("video_likes");
+// 		videoLikes.value = [];
+// 	}
+// };
 </script>
