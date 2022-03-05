@@ -4,20 +4,12 @@
 		v-model:items.number="form.items"
 		v-model:retweets="form.retweets"
 		v-model:replies="form.replies"
-		@search="getUser()"
+		type="user_history"
 		:history="user_history"
 		:showHistory="showHistory"
-		type="user_history"
+		@search="getUser()"
 		@media="historyClick"
 	/>
-	<!-- <div class="relative">
-		<SearchHistory
-			v-show="showHistory"
-			:history="user_history"
-			type="user_history"
-			@media="historyClick"
-		/>
-	</div> -->
 
 	<CacheNotification
 		:cache="cache"
@@ -65,7 +57,6 @@ import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
 
 import Form from "../components/Form.vue";
-import SearchHistory from "../components/SearchHistory.vue";
 import UserCard from "../components/UserCard.vue";
 import Media from "../components/Media.vue";
 import CacheNotification from "../components/CacheNotification.vue";
@@ -86,7 +77,6 @@ const {
 	getUserID,
 	localData,
 	apiCall,
-	userInfo,
 	cache,
 	cached_on,
 	next_token,
@@ -124,7 +114,6 @@ const getUser = async () => {
 		name: "user",
 		query: { q: form.value.query },
 	});
-	// await getMedia();
 	localData(form.value.query, "user", getMedia);
 };
 
@@ -218,7 +207,6 @@ const next = (val) => {
 			index: index,
 		},
 	});
-	// console.log(tweet);
 };
 
 const prev = (val) => {
@@ -234,6 +222,5 @@ const prev = (val) => {
 			index: index,
 		},
 	});
-	// console.log(tweet);
 };
 </script>

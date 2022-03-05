@@ -67,7 +67,7 @@ export default {
 
 			text = text.replace(
 				/@(\w+)/g,
-				'<a href="/?u=$1" class="hover:text-gray-500 dark:hover:text-gray-100" target="_blank">@$1</a>'
+				'<a href="/?q=$1" class="hover:text-gray-500 dark:hover:text-gray-100" target="_blank">@$1</a>'
 			);
 
 			text = text.replace(

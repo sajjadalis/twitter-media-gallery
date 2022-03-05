@@ -15,7 +15,7 @@
 						:href="user.profile_image_url_https.replace('_normal', '')"
 						target="_blank"
 						><img
-							class="h-32 w-32 rounded-full border-[7px] border-white dark:border-zinc-900 -mt-16 mr-4"
+							class="h-32 w-32 rounded-full border-8 border-white dark:border-zinc-900 -mt-16 mr-4"
 							:src="user.profile_image_url_https.replace('_normal', '')"
 							alt=""
 					/></a>

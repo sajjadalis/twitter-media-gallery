@@ -4,10 +4,12 @@
 		v-model:items.number="form.items"
 		v-model:retweets="form.retweets"
 		v-model:replies="form.replies"
+		type="hashtag_history"
 		:history="hashtag_history"
 		:showHistory="showHistory"
-		type="hashtag_history"
 		@search="getQuery()"
+		@media="historyClick"
+		placeholder="#hashtag / #multiple #hashtags / keyword"
 	/>
 
 	<CacheNotification

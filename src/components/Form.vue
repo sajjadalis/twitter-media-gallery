@@ -21,9 +21,21 @@
 			<div
 				v-if="history.length > 0"
 				v-show="showHistory"
-				class="absolute top-11 leading-10 w-full max-h-96 overflow-y-auto scrollbar scrollbar-thumb-slate-300 scrollbar-track-slate-200 dark:scrollbar-thumb-zinc-700 dark:scrollbar-track-zinc-600 bg-slate-100 dark:bg-zinc-800"
+				class="absolute top-11 leading-10 w-full max-h-96 overflow-y-auto scrollbar scrollbar-thumb-slate-300 scrollbar-track-slate-200 dark:scrollbar-thumb-zinc-700 dark:scrollbar-track-zinc-600 bg-slate-100 dark:bg-zinc-800 shadow border-2 mt-[-1px] border-t-0 border-slate-200 z-10 scroll-width"
 			>
-				<h3 class="pl-2 py-1 font-bold">Search History</h3>
+				<div class="flex items-center justify-between py-2">
+					<h3 class="pl-2 font-bold mr-2 leading-none">Search History</h3>
+					<span
+						class="border border-red-600 bg-red-500 hover:bg-red-600 text-white px-2 text-center leading-none text-xs py-1 mr-3 cursor-pointer block"
+						@mousedown.prevent
+						@click.prevent="clearHistory"
+					>
+						<div class="flex items-center leading-none">
+							<TrashIcon class="h-3 w-3 mr-1" />
+							Clear All
+						</div>
+					</span>
+				</div>
 				<div class="relative" v-for="(keyword, i) in history" :key="i">
 					<span
 						class="border-t bg-slate-100 border-slate-200 hover:bg-slate-200 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-900 py-1 px-2 mr-2 cursor-pointer block"
@@ -31,26 +43,16 @@
 						@click.prevent="$emit('media', keyword)"
 						>{{ keyword }}
 					</span>
-					<button
-						class="absolute top-0 right-0"
+					<span
+						class="absolute top-0 right-0 cursor-pointer block"
 						@mousedown.prevent
 						@click.prevent="removeHistory(i, keyword)"
 					>
 						<XCircleIcon
 							class="h-4 w-4 mr-7 mt-4 text-slate-600 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-600"
 						/>
-					</button>
+					</span>
 				</div>
-				<button
-					class="border border-red-600 bg-red-500 hover:bg-red-600 text-white py-1 px-2 leading-snug w-full text-center"
-					@mousedown.prevent
-					@click.prevent="clearHistory"
-				>
-					<div class="flex items-center">
-						<TrashIcon class="h-4 w-4 mr-1" />
-						Clear All
-					</div>
-				</button>
 			</div>
 		</div>
 
