@@ -121,7 +121,7 @@ export default {
 		},
 		placeholder: {
 			type: String,
-			default: "Twitter Username",
+			default: "twitter username",
 		},
 		type: {
 			type: String,
