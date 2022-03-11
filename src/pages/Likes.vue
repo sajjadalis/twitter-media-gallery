@@ -29,9 +29,11 @@
 </template>
 
 <script setup>
+import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
 import Media from "../components/Media.vue";
 
+const router = useRouter();
 const media = ref([]);
 
 onMounted(() => {
@@ -43,30 +45,39 @@ onMounted(() => {
 
 const next = (val) => {
 	let index = Number(val);
-	index += 1;
+
+	if (media.value.length - 1 == index) {
+		index = 0;
+	} else {
+		index += 1;
+	}
+
 	let tweet = media.value[index];
 	router.push({
-		name: "user_modal",
+		name: "likes_modal",
 		params: {
 			id: tweet.media_key,
 			data: JSON.stringify(tweet),
-			user: form.value.query,
 			index: index,
 		},
 	});
-	// console.log(tweet);
 };
 
 const prev = (val) => {
 	let index = Number(val);
-	index -= 1;
+
+	if (index == 0) {
+		index = media.value.length - 1;
+	} else {
+		index -= 1;
+	}
+
 	let tweet = media.value[index];
 	router.push({
-		name: "user_modal",
+		name: "likes_modal",
 		params: {
 			id: tweet.media_key,
 			data: JSON.stringify(tweet),
-			user: form.value.query,
 			index: index,
 		},
 	});

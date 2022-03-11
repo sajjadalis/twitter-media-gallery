@@ -229,14 +229,19 @@
 </template>
 <script setup>
 import { onMounted, ref, watch } from "vue";
+import { usePreferredDark } from "@vueuse/core";
 import { Switch, Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
 import { MenuIcon, XIcon, SunIcon, MoonIcon } from "@heroicons/vue/outline";
 
 const isDark = ref(false);
+const preferredDark = usePreferredDark();
 
 onMounted(() => {
 	let dark = localStorage.getItem("isDark");
 	if (dark == "true") {
+		document.documentElement.classList.add("dark");
+		isDark.value = true;
+	} else if (!dark && preferredDark.value) {
 		document.documentElement.classList.add("dark");
 		isDark.value = true;
 	} else {

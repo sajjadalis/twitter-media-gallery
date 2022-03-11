@@ -196,7 +196,13 @@ const getMedia = async (token) => {
 
 const next = (val) => {
 	let index = Number(val);
-	index += 1;
+
+	if (media.value.length - 1 == index) {
+		index = 0;
+	} else {
+		index += 1;
+	}
+
 	let tweet = media.value[index];
 	router.push({
 		name: "user_modal",
@@ -211,7 +217,13 @@ const next = (val) => {
 
 const prev = (val) => {
 	let index = Number(val);
-	index -= 1;
+
+	if (index == 0) {
+		index = media.value.length - 1;
+	} else {
+		index -= 1;
+	}
+
 	let tweet = media.value[index];
 	router.push({
 		name: "user_modal",

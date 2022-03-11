@@ -99,13 +99,13 @@ const nav = (val) => {
 
 onKeyStroke("ArrowRight", (e) => {
 	e.preventDefault();
-	console.log("next media");
+	// console.log("next media");
 	emits("next", route.params.index);
 });
 
 onKeyStroke("ArrowLeft", (e) => {
 	e.preventDefault();
-	console.log("prev media");
+	// console.log("prev media");
 	emits("prev", route.params.index);
 });
 
@@ -119,7 +119,7 @@ const close = () => {
 
 onKeyStroke("Escape", (e) => {
 	e.preventDefault();
-	console.log("close");
+	// console.log("close");
 	close();
 });
 
