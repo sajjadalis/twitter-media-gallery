@@ -161,19 +161,65 @@
 					</div>
 					<div class="px-2 pt-2 pb-3 space-y-1">
 						<router-link class="px-3 py-2 flex flex-row items-center" to="/">
-							<UserIcon class="h-5 w-5 mr-1" />User</router-link
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="h-5 w-5 mr-1"
+							>
+								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+								<circle cx="12" cy="7" r="4"></circle>
+							</svg>
+							User</router-link
 						>
 						<router-link
 							class="px-3 py-2 flex flex-row items-center"
 							to="/search"
 						>
-							<SearchIcon class="h-5 w-5 mr-1" />Search</router-link
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="h-5 w-5 mr-1"
+							>
+								<circle cx="11" cy="11" r="8"></circle>
+								<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+							</svg>
+							Search</router-link
 						>
 						<router-link
 							class="px-3 py-2 flex flex-row items-center"
 							to="/likes"
 						>
-							<HeartIcon class="h-5 w-5 mr-1" />Likes</router-link
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="h-5 w-5 mr-1"
+							>
+								<path
+									d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+								></path>
+							</svg>
+							Likes</router-link
 						>
 					</div>
 				</div>

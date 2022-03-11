@@ -1,9 +1,15 @@
 <template>
 	<div
-		class="overlay fixed top-0 left-0 bottom-0 right-0 z-10 bg-zinc-900 w-full h-full bg-opacity-80 py-7 text-center"
-		@click="close"
+		class="fixed top-0 left-0 bottom-0 right-0 z-10 w-full h-full bg-opacity-80 py-7 text-center"
 	>
-		<div v-if="data && data.type == 'photo'" class="inline-block mx-auto -mt-7">
+		<div
+			class="overlay bg-zinc-900 absolute top-0 left-0 bottom-0 right-0 w-full h-full bg-opacity-80 -z-10"
+			@click="close"
+		></div>
+		<div
+			v-if="data && data.type == 'photo'"
+			class="inline-block mx-auto -mt-7 z-20"
+		>
 			<img :src="data.url" :style="style" class="w-auto h-screen m-auto" />
 			<Toolbar
 				:img="data"
@@ -15,7 +21,7 @@
 			/>
 		</div>
 
-		<div v-else class="w-5/6 h-full mx-auto bg-black relative">
+		<div v-else class="w-5/6 h-full mx-auto bg-black relative z-50">
 			<video
 				v-if="video"
 				controls
@@ -60,6 +66,7 @@
 </template>
 <script setup>
 import { ref, onMounted } from "vue";
+import { onKeyStroke, onClickOutside } from "@vueuse/core";
 import { useRoute, useRouter } from "vue-router";
 import getVideo from "../composeables/getVideo";
 import Toolbar from "../components/Toolbar.vue";
@@ -90,6 +97,32 @@ const nav = (val) => {
 	}
 };
 
+onKeyStroke("ArrowRight", (e) => {
+	e.preventDefault();
+	console.log("next media");
+	emits("next", route.params.index);
+});
+
+onKeyStroke("ArrowLeft", (e) => {
+	e.preventDefault();
+	console.log("prev media");
+	emits("prev", route.params.index);
+});
+
+const close = () => {
+	let endpoint = { name: props.type };
+	if (route.params && route.params.query) {
+		endpoint.query = { q: route.params.query };
+	}
+	router.push(endpoint);
+};
+
+onKeyStroke("Escape", (e) => {
+	e.preventDefault();
+	console.log("close");
+	close();
+});
+
 onMounted(async () => {
 	if (data.value) {
 		data.value = JSON.parse(data.value);
@@ -102,18 +135,6 @@ onMounted(async () => {
 		});
 	}
 });
-
-const close = (e) => {
-	let classes = e.path[0].className;
-	if (typeof classes == "string" && classes.includes("overlay")) {
-		let endpoint = { name: props.type };
-
-		if (route.params && route.params.query) {
-			endpoint.query = { q: route.params.query };
-		}
-		router.push(endpoint);
-	}
-};
 
 const style = ref({});
 
