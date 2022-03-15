@@ -75,7 +75,6 @@ const hashtag_history = ref([]);
 const showHistory = ref(false);
 
 const {
-	getUserID,
 	localData,
 	apiCall,
 	cache,

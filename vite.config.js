@@ -7,4 +7,7 @@ export default defineConfig({
 	build: {
 		outDir: "../../laragon/www/vue-tweeties",
 	},
+	server: {
+		host: true,
+	},
 });
