@@ -2,7 +2,9 @@
 
 Twitter Media Gallery (based on Vue 3 + Vite + Tailwind CSS) is using Twitter Official API to fetch media (photos and videos) from a Twitter User timeline or Hashtag/Keyword search and then display it in a masonry layout.
 
-**[Demo Preview (Images)](https://pinboard.opera.com/view/da9b047c-8317-4432-8fbd-7a5d04f351d3)**
+**[Demo Preview]: Coming Soon**
+
+![Twitter Media Gallery](https://i.imgur.com/PkuE67c.png)
 
 You will need to create an app in [Twitter Developer Portal](https://developer.twitter.com) and get [Bearer Token](https://i.imgur.com/tGBFcNq.png).
 
