@@ -21,7 +21,7 @@
 					>
 						<img
 							v-if="tweet.type == 'photo'"
-							:src="tweet.url + '?format=jpg&name=small'"
+							:src="tweet.url + thumbnails"
 							class="mx-auto" />
 						<img
 							v-else
@@ -63,6 +63,12 @@
 		No photos found
 	</div>
 
+	<ToggleThumb
+		v-if="media.length"
+		@toggleThumb="thumb"
+		:showThumb="showThumb"
+	/>
+
 	<ToggleText v-if="media.length" @toggle="text" :showText="showText" />
 
 	<ScrollToTop v-if="media.length" />
@@ -72,11 +78,14 @@ import { onMounted, ref } from "vue";
 import { HeartIcon } from "@heroicons/vue/outline";
 import { PlayIcon } from "@heroicons/vue/solid";
 import TweetText from "./TweetText.vue";
+import ToggleThumb from "./ToggleThumb.vue";
 import ToggleText from "./ToggleText.vue";
 import ScrollToTop from "./ScrollToTop.vue";
 
 const mediaLikes = ref([]);
 const showText = ref(null);
+const showThumb = ref(null);
+const thumbnails = ref("?format=jpg&name=small");
 
 const props = defineProps(["media", "query", "result_count", "type"]);
 
@@ -89,6 +98,17 @@ onMounted(() => {
 	let showTweetText = localStorage.getItem("show_text");
 	if (showTweetText) {
 		showText.value = showTweetText;
+	}
+
+	let showThumbnails = localStorage.getItem("show_thumb");
+	if (showThumbnails) {
+		showThumb.value = showThumbnails;
+
+		if (showThumbnails == "false") {
+			thumbnails.value = "";
+		}
+	} else {
+		showThumb.value = "true";
 	}
 });
 
@@ -135,5 +155,16 @@ const text = () => {
 		showText.value = "true";
 	}
 	localStorage.setItem("show_text", showText.value);
+};
+
+const thumb = () => {
+	if (showThumb.value == "true") {
+		showThumb.value = "false";
+		thumbnails.value = "";
+	} else {
+		showThumb.value = "true";
+		thumbnails.value = "?format=jpg&name=small";
+	}
+	localStorage.setItem("show_thumb", showThumb.value);
 };
 </script>
