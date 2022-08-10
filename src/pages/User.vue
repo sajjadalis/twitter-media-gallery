@@ -224,8 +224,6 @@ const getMedia = async (token) => {
 		media: media.value,
 	};
 
-	console.log(userData);
-
 	localStorage.setItem("u_" + form.value.query, JSON.stringify(userData));
 };
 

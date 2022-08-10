@@ -65,7 +65,6 @@ const getData = () => {
 		await api
 			.get(query)
 			.then((res) => {
-				console.log(res.data);
 				// Return if reponse contains errors with error details
 				if (res.data.errors) {
 					message.value = res.data.errors[0].detail;
