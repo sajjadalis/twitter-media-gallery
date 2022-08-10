@@ -7,7 +7,15 @@
 		type="user_history"
 		:history="user_history"
 		:showHistory="showHistory"
+		:showInlineHistory="showInlineHistory"
 		@search="getUser()"
+		@media="historyClick"
+	/>
+
+	<SearchHistory
+		v-if="showInlineHistory == 'true'"
+		type="user_history"
+		:history="user_history"
 		@media="historyClick"
 	/>
 
@@ -26,7 +34,13 @@
 		:key="$route.fullPath"
 	></router-view>
 
-	<Media :media="media" :query="form.query" type="user_modal" />
+	<Media
+		:media="media"
+		:query="form.query"
+		type="user_modal"
+		@toggleHistory="toggleHistory"
+		:showInlineHistory="showInlineHistory"
+	/>
 
 	<div v-if="loading" class="spinner my-10 mx-auto"></div>
 
@@ -57,6 +71,7 @@ import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
 
 import Form from "../components/Form.vue";
+import SearchHistory from "../components/SearchHistory.vue";
 import UserCard from "../components/UserCard.vue";
 import Media from "../components/Media.vue";
 import CacheNotification from "../components/CacheNotification.vue";
@@ -87,6 +102,8 @@ const {
 	message,
 } = getData();
 
+const showInlineHistory = ref(null);
+
 onMounted(() => {
 	let history = JSON.parse(localStorage.getItem("user_history"));
 
@@ -97,7 +114,23 @@ onMounted(() => {
 	if (form.value.query) {
 		localData(form.value.query, "user", getMedia);
 	}
+
+	let showHistory = localStorage.getItem("show_history");
+	if (showHistory) {
+		showInlineHistory.value = showHistory;
+	} else {
+		showInlineHistory.value = "false";
+	}
 });
+
+const toggleHistory = () => {
+	if (showInlineHistory.value == "true") {
+		showInlineHistory.value = "false";
+	} else {
+		showInlineHistory.value = "true";
+	}
+	localStorage.setItem("show_history", showInlineHistory.value);
+};
 
 const historyClick = async (val) => {
 	router.push({
@@ -173,7 +206,7 @@ const getMedia = async (token) => {
 	}
 
 	// Search Query parameters
-	let params = `${exclude}max_results=${form.value.items}&tweet.fields=id,created_at,text,public_metrics,attachments&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
+	let params = `${exclude}max_results=${form.value.items}&tweet.fields=id,created_at,text,public_metrics,attachments,referenced_tweets&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
 
 	let search_params = params;
 
@@ -190,6 +223,8 @@ const getMedia = async (token) => {
 		user: userDetails.value,
 		media: media.value,
 	};
+
+	console.log(userData);
 
 	localStorage.setItem("u_" + form.value.query, JSON.stringify(userData));
 };

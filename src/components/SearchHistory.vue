@@ -1,33 +1,47 @@
 <template>
-	<div
-		v-if="history.length > 0"
-		class="block leading-10 w-2/3 max-h-96 overflow-y-auto scrollbar scrollbar-thumb-slate-300 scrollbar-track-slate-200 dark:scrollbar-thumb-zinc-700 dark:scrollbar-track-zinc-600 absolute top-0 bg-slate-100 dark:bg-zinc-800"
-	>
-		<h3 class="pl-2 py-1 font-bold">Search History</h3>
-		<div class="relative" v-for="(keyword, i) in history" :key="i">
+	<div v-if="history.length > 0" class="block mt-5 leading-10">
+		<span class="mr-2 font-bold">Search History:</span>
+		<span class="relative" v-for="(keyword, i) in history" :key="i">
 			<span
-				class="border-t bg-slate-100 border-slate-200 hover:bg-slate-200 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-900 py-1 px-2 mr-2 cursor-pointer block"
-				@mousedown.prevent
+				class="border bg-slate-100 hover:bg-slate-200 py-1 px-2 mr-2 cursor-pointer"
 				@click.prevent="$emit('media', keyword)"
 				>{{ keyword }}
 			</span>
 			<button
 				class="absolute top-0 right-0"
-				@mousedown.prevent
 				@click.prevent="removeHistory(i, keyword)"
 			>
-				<XCircleIcon
-					class="h-4 w-4 mr-7 mt-4 text-slate-600 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-600"
-				/>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 mr-1 -mt-2 text-slate-600 hover:text-red-600"
+					viewBox="0 0 20 20"
+					fill="currentColor"
+				>
+					<path
+						fill-rule="evenodd"
+						d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+						clip-rule="evenodd"
+					/>
+				</svg>
 			</button>
-		</div>
+		</span>
 		<button
 			class="border border-red-600 bg-red-500 hover:bg-red-600 text-white py-1 px-2 leading-snug"
-			@mousedown.prevent
 			@click.prevent="clearHistory"
 		>
 			<div class="flex items-center">
-				<TrashIcon class="h-4 w-4 mr-1" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-4 w-4 mr-1"
+					viewBox="0 0 20 20"
+					fill="currentColor"
+				>
+					<path
+						fill-rule="evenodd"
+						d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+						clip-rule="evenodd"
+					/>
+				</svg>
 				Clear All
 			</div>
 		</button>

@@ -29,7 +29,7 @@
 			<span
 				v-if="img.public_metrics && img.public_metrics.retweet_count"
 				class="flex flex-row items-center ml-2"
-				><RefreshIcon class="h-3 w-3 mr-1" />
+				><RetweetIcon class="h-3 w-3 mr-1" />
 				{{ img.public_metrics.retweet_count }}</span
 			>
 
@@ -48,12 +48,12 @@ import {
 	UserIcon,
 	ClockIcon,
 	HeartIcon,
-	RefreshIcon,
 	ChatIcon,
 } from "@heroicons/vue/outline";
+import RetweetIcon from "./RetweetIcon.vue";
 export default {
 	props: ["img", "query"],
-	components: { UserIcon, ClockIcon, HeartIcon, RefreshIcon, ChatIcon },
+	components: { UserIcon, ClockIcon, HeartIcon, RetweetIcon, ChatIcon },
 	setup() {
 		const date = (date) => {
 			return moment(date).fromNow();

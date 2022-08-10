@@ -22,15 +22,23 @@
 						<img
 							v-if="tweet.type == 'photo'"
 							:src="tweet.url + thumbnails"
-							class="mx-auto" />
+							class="mx-auto"
+						/>
 						<img
 							v-else
 							:src="tweet.preview_image_url + '?format=jpg&name=small'"
-							class="mx-auto" />
+							class="mx-auto"
+						/>
 						<PlayIcon
 							v-if="tweet.type != 'photo'"
 							class="absolute top-1/2 left-1/2 mx-auto h-16 w-16 -ml-8 -mt-8 opacity-50 text-white"
-					/></router-link>
+						/>
+
+						<RetweetIcon
+							v-if="tweet.referenced_tweets"
+							class="h-5 w-5 absolute bottom-2 left-2 text-white"
+						/>
+					</router-link>
 
 					<button
 						@click.prevent="likeMedia(tweet), $emit('like', tweet)"
@@ -63,21 +71,29 @@
 		No photos found
 	</div>
 
-	<ToggleThumb
-		v-if="media.length"
-		@toggleThumb="thumb"
-		:showThumb="showThumb"
-	/>
+	<div class="fixed bottom-0 right-0 flex flex-col mb-2 mr-2 space-y-1">
+		<ToggleHistory
+			@click.prevent="$emit('toggleHistory')"
+			:showInlineHistory="showInlineHistory"
+		/>
+		<ToggleThumb
+			v-if="media.length"
+			@toggleThumb="thumb"
+			:showThumb="showThumb"
+		/>
 
-	<ToggleText v-if="media.length" @toggle="text" :showText="showText" />
+		<ToggleText v-if="media.length" @toggle="text" :showText="showText" />
 
-	<ScrollToTop v-if="media.length" />
+		<ScrollToTop v-if="media.length" />
+	</div>
 </template>
 <script setup>
 import { onMounted, ref } from "vue";
-import { HeartIcon } from "@heroicons/vue/outline";
 import { PlayIcon } from "@heroicons/vue/solid";
 import TweetText from "./TweetText.vue";
+import { HeartIcon, ClockIcon } from "@heroicons/vue/outline";
+import RetweetIcon from "./RetweetIcon.vue";
+import ToggleHistory from "./ToggleHistory.vue";
 import ToggleThumb from "./ToggleThumb.vue";
 import ToggleText from "./ToggleText.vue";
 import ScrollToTop from "./ScrollToTop.vue";
@@ -87,7 +103,15 @@ const showText = ref(null);
 const showThumb = ref(null);
 const thumbnails = ref("?format=jpg&name=small");
 
-const props = defineProps(["media", "query", "result_count", "type"]);
+const props = defineProps([
+	"media",
+	"query",
+	"result_count",
+	"type",
+	"showInlineHistory",
+]);
+
+defineEmits(["toggleHistory"]);
 
 onMounted(() => {
 	let media = JSON.parse(localStorage.getItem("media_likes"));

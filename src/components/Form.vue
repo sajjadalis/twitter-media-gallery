@@ -19,7 +19,7 @@
 			</span>
 
 			<div
-				v-if="history.length > 0"
+				v-if="history.length > 0 && showInlineHistory == 'false'"
 				v-show="showHistory"
 				class="absolute top-11 leading-10 w-full max-h-96 overflow-y-auto scrollbar scrollbar-thumb-slate-300 scrollbar-track-slate-200 dark:scrollbar-thumb-zinc-700 dark:scrollbar-track-zinc-600 bg-slate-100 dark:bg-zinc-800 shadow border-2 mt-[-1px] border-t-0 border-slate-200 z-10 scroll-width"
 			>
@@ -132,6 +132,10 @@ export default {
 		showHistory: {
 			type: Boolean,
 			default: false,
+		},
+		showInlineHistory: {
+			type: String,
+			default: "false",
 		},
 	},
 	components: {
