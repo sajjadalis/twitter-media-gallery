@@ -7,9 +7,17 @@
 		type="hashtag_history"
 		:history="hashtag_history"
 		:showHistory="showHistory"
+		:showInlineHistory="showInlineHistory"
 		@search="getQuery()"
 		@media="historyClick"
 		placeholder="#hashtag / #multiple #hashtags / keyword"
+	/>
+
+	<SearchHistory
+		v-if="showInlineHistory == 'true'"
+		type="hashtag_history"
+		:history="hashtag_history"
+		@media="historyClick"
 	/>
 
 	<CacheNotification
@@ -25,7 +33,13 @@
 		:key="$route.fullPath"
 	></router-view>
 
-	<Media :media="media" :query="form.query" type="search_modal" />
+	<Media
+		:media="media"
+		:query="form.query"
+		type="search_modal"
+		@toggleHistory="toggleHistory"
+		:showInlineHistory="showInlineHistory"
+	/>
 
 	<div v-if="loading" class="spinner my-10 mx-auto"></div>
 
@@ -73,6 +87,7 @@ const form = ref({
 
 const hashtag_history = ref([]);
 const showHistory = ref(false);
+const showInlineHistory = ref(null);
 
 const {
 	localData,
@@ -96,7 +111,23 @@ onMounted(async () => {
 	if (form.value.query) {
 		localData(form.value.query, "search", getMedia);
 	}
+
+	let showHistory = localStorage.getItem("show_history");
+	if (showHistory) {
+		showInlineHistory.value = showHistory;
+	} else {
+		showInlineHistory.value = "false";
+	}
 });
+
+const toggleHistory = () => {
+	if (showInlineHistory.value == "true") {
+		showInlineHistory.value = "false";
+	} else {
+		showInlineHistory.value = "true";
+	}
+	localStorage.setItem("show_history", showInlineHistory.value);
+};
 
 const historyClick = async (val) => {
 	router.push({

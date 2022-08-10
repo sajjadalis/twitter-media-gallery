@@ -85,8 +85,10 @@ const form = ref({
 	retweets: false,
 	replies: true,
 });
+
 const user_history = ref([]);
 const showHistory = ref(false);
+const showInlineHistory = ref(null);
 
 const {
 	getUserID,
@@ -101,8 +103,6 @@ const {
 	loading,
 	message,
 } = getData();
-
-const showInlineHistory = ref(null);
 
 onMounted(() => {
 	let history = JSON.parse(localStorage.getItem("user_history"));
