@@ -1,13 +1,17 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 
 // https://vitejs.dev/config/
-export default defineConfig({
-	plugins: [vue()],
-	build: {
-		outDir: "../../laragon/www/vue-tweeties",
-	},
-	server: {
-		host: true,
-	},
-});
+export default ({ mode }) => {
+	process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
+
+	return defineConfig({
+		plugins: [vue()],
+		build: {
+			outDir: process.env.VITE_BUILD_DIR,
+		},
+		server: {
+			host: true,
+		},
+	});
+};
