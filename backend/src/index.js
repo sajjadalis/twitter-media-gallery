@@ -1,5 +1,5 @@
 const express = require("express");
-const userRoute = require("./routes/userRoute");
+const routes = require("./routes");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -8,11 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use("/user", userRoute);
-
-app.get("/", async (req, res) => {
-	res.json("twitter api back-end working");
-});
+app.use("/", routes);
 
 const PORT = process.env.PORT || 5000;
 
