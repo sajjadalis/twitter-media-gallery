@@ -48,8 +48,9 @@ const getData = () => {
 
 	const getUserID = async (user) => {
 		await api
-			.get(`1.1/users/show.json?screen_name=${user}`)
+			.get(`/username/${user}`)
 			.then((res) => {
+				// console.log(res.data);
 				userDetails.value = res.data;
 			})
 			.catch((err) => {
@@ -65,7 +66,8 @@ const getData = () => {
 		await api
 			.get(query)
 			.then((res) => {
-				// Return if reponse contains errors with error details
+				// Return if response contains errors with error details
+				// console.log(res.data);
 				if (res.data.errors) {
 					message.value = res.data.errors[0].detail;
 					loading.value = false;
@@ -81,7 +83,7 @@ const getData = () => {
 					return;
 				}
 
-				// If reponse have meta property then set next_token and results count
+				// If response have meta property then set next_token and results count
 				if (res.data.hasOwnProperty("meta")) {
 					result_count.value += res.data.meta.result_count;
 					next_token.value = res.data.meta.next_token;

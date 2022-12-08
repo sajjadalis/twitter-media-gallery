@@ -196,18 +196,17 @@ const getMedia = async (token) => {
 	// userDetails.value = userInfo.value;
 
 	// Exclude replies and retweets from search
-	let exclude = "exclude=retweets,replies&";
+	let exclude = "retweets,replies";
 	if (form.value.retweets && form.value.replies) {
 		exclude = "";
 	} else if (form.value.retweets) {
-		exclude = "exclude=replies&";
+		exclude = "replies";
 	} else if (form.value.replies) {
-		exclude = "exclude=retweets&";
+		exclude = "retweets";
 	}
 
 	// Search Query parameters
-	let params = `${exclude}max_results=${form.value.items}&tweet.fields=id,created_at,text,public_metrics,attachments,referenced_tweets&expansions=attachments.media_keys&media.fields=media_key,type,url,preview_image_url`;
-
+	let params = `items=${form.value.items}&exclude=${exclude}`;
 	let search_params = params;
 
 	// If pagination next_token exists then and it to the query params to load more data
@@ -215,7 +214,7 @@ const getMedia = async (token) => {
 		search_params = `${params}&pagination_token=${token}`;
 	}
 
-	await apiCall(`2/users/${userDetails.value.id_str}/tweets?${search_params}`);
+	await apiCall(`/tweets/${userDetails.value.id_str}?${search_params}`);
 
 	const userData = {
 		cached_on: new Date(),

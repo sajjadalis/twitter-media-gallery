@@ -185,26 +185,22 @@ const getMedia = async (token) => {
 	q = q.replace(/#/g, "%23");
 	q = q.replace(" ", "+");
 
-	let exclude = " -is:retweet -is:reply";
+	let exclude = "retweets,replies";
 	if (form.value.retweets && form.value.replies) {
 		exclude = "";
 	} else if (form.value.retweets) {
-		exclude = " -is:reply";
+		exclude = "replies";
 	} else if (form.value.replies) {
-		exclude = " -is:retweet";
+		exclude = "retweets";
 	}
 
-	let params = `query=${q + exclude}&max_results=${
-		form.value.items
-	}&tweet.fields=created_at,author_id,public_metrics&expansions=attachments.media_keys,author_id&media.fields=media_key,preview_image_url,url`;
-
-	let search_params = params;
+	let search_params = `items=${form.value.items}&exclude=${exclude}`;
 
 	if (token) {
-		search_params = `${params}&pagination_token=${token}`;
+		search_params = `${search_params}&pagination_token=${token}`;
 	}
 
-	await apiCall(`2/tweets/search/recent?${search_params}`);
+	await apiCall(`/search?q=${q}&${search_params}`);
 
 	const search = {
 		cached_on: new Date(),
