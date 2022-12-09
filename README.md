@@ -6,8 +6,6 @@ Twitter Media Gallery (based on Vue 3 + Vite + Tailwind CSS + Express backend) i
 
 ![Twitter Media Gallery](https://i.imgur.com/PkuE67c.png)
 
-You will need to create an app in [Twitter Developer Portal](https://developer.twitter.com) and get [Bearer Token](https://i.imgur.com/tGBFcNq.png).
-
 ## Features:
 
 - Search Photos & Videos from User Timeline
@@ -19,6 +17,8 @@ You will need to create an app in [Twitter Developer Portal](https://developer.t
 ## Requirement
 - Developer access to [Twitter API](https://developer.twitter.com)
 - [Node.js](https://nodejs.org/en/download/) for development & build
+
+You will need to create an app in [Twitter Developer Portal](https://developer.twitter.com) and get [Bearer Token](https://i.imgur.com/tGBFcNq.png).
 
 ## Project setup
 
@@ -60,12 +60,6 @@ npm run dev
 
 ```sh
 npm run build
-```
-
-**To builds, sync capacitor & copies to Android**
-
-```sh
-npm run cap-android
 ```
 
 *CORS proxy replaced with Express backend since Heroku is no longer a free service where CORS proxy was hosted.So Express server must be running for it to work. It's better for security and no longer exposes Twitter API token in build.*
