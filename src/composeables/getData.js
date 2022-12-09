@@ -121,8 +121,27 @@ const getData = () => {
 					media.value.push(tweet);
 				});
 
+				let images = [];
+				media.value.forEach((img) => {
+					if (img.type == "video") {
+						images.push(img.preview_image_url);
+					} else {
+						images.push(img.url);
+					}
+				});
+
+				// Promise for all images to resolve and then set loading to false
+				Promise.all(images)
+					.then(() => {
+						console.log("Images loaded!");
+						loading.value = false;
+					})
+					.catch((error) => {
+						console.error("Some image(s) failed loading!");
+						console.error(error.message);
+					});
+
 				// Set loading to false.
-				loading.value = false;
 			})
 			.catch((err) => {
 				message.value = err.message;
